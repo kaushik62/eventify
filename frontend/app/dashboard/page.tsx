@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Calendar, MapPin } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Ticket,
+  ArrowUpRight,
+  Clock3,
+  Sparkles,
+} from "lucide-react";
+
 import { getEventImageUrl } from "@/lib/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +19,14 @@ import { Booking } from "@/lib/types";
 import { useAuth } from "@/lib/auth";
 
 const statusColor: Record<string, string> = {
-  CONFIRMED: "bg-green-100 text-green-700",
-  PENDING: "bg-yellow-100 text-yellow-700",
-  CANCELLED: "bg-gray-100 text-gray-600",
-  FAILED: "bg-red-100 text-red-700",
+  CONFIRMED:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400",
+  PENDING:
+    "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400",
+  CANCELLED:
+    "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400",
+  FAILED:
+    "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400",
 };
 
 export default function DashboardPage() {
@@ -34,35 +46,169 @@ export default function DashboardPage() {
   }, []);
 
   const now = new Date();
-  const upcoming = bookings.filter((b) => b.event_date && new Date(b.event_date) >= now && b.status === "CONFIRMED");
+
+  const upcoming = bookings.filter(
+    (b) =>
+      b.event_date &&
+      new Date(b.event_date) >= now &&
+      b.status === "CONFIRMED"
+  );
+
   const past = bookings.filter((b) => !upcoming.includes(b));
 
   const cancel = async (id: number) => {
     if (!confirm("Cancel this booking?")) return;
+
     await api.delete(`/bookings/${id}`);
     load();
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-bold">Welcome back, {user?.name.split(" ")[0]}</h1>
+    <main className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:max-w-md">
-        <div className="rounded-xl border border-border p-5">
-          <p className="text-sm text-muted-foreground">Upcoming Events</p>
-          <p className="mt-1 text-2xl font-bold">{upcoming.length}</p>
+        {/* Header */}
+        <section className="relative overflow-hidden rounded-3xl border bg-background p-6 shadow-sm sm:p-8">
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
+
+          <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5" />
+                Your event dashboard
+              </div>
+
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Welcome back,{" "}
+                <span className="text-primary">
+                  {user?.name?.split(" ")[0]}
+                </span>
+              </h1>
+
+              <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
+                Keep track of your upcoming events and manage all your
+                bookings in one place.
+              </p>
+            </div>
+
+            <div className="hidden shrink-0 rounded-2xl border bg-muted/30 p-4 sm:block">
+              <Ticket className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+        </section>
+
+        {/* Stats */}
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
+          <StatCard
+            icon={<Calendar className="h-5 w-5" />}
+            label="Upcoming Events"
+            value={upcoming.length}
+            description="Confirmed events ahead"
+          />
+
+          <StatCard
+            icon={<Ticket className="h-5 w-5" />}
+            label="Total Bookings"
+            value={bookings.length}
+            description="All your bookings"
+          />
+        </section>
+
+        {/* Upcoming */}
+        <section className="mt-12">
+          <SectionHeader
+            title="Upcoming Bookings"
+            description="Events you are attending"
+            count={upcoming.length}
+          />
+
+          <div className="mt-5">
+            <BookingList
+              bookings={upcoming}
+              loading={loading}
+              onCancel={cancel}
+              emptyText="No upcoming bookings yet."
+            />
+          </div>
+        </section>
+
+        {/* Past */}
+        <section className="mt-12 pb-10">
+          <SectionHeader
+            title="Past & Other Bookings"
+            description="Your previous and inactive bookings"
+            count={past.length}
+          />
+
+          <div className="mt-5">
+            <BookingList
+              bookings={past}
+              loading={loading}
+              onCancel={cancel}
+              emptyText="Nothing here yet."
+            />
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+  description,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  description: string;
+}) {
+  return (
+    <div className="group rounded-2xl border bg-background p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex items-start justify-between">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          {icon}
         </div>
-        <div className="rounded-xl border border-border p-5">
-          <p className="text-sm text-muted-foreground">Total Bookings</p>
-          <p className="mt-1 text-2xl font-bold">{bookings.length}</p>
-        </div>
+
+        <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
       </div>
 
-      <h2 className="mb-4 mt-10 text-lg font-semibold">Upcoming Bookings</h2>
-      <BookingList bookings={upcoming} loading={loading} onCancel={cancel} emptyText="No upcoming bookings yet." />
+      <div className="mt-5">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="mt-1 text-3xl font-bold tracking-tight">{value}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+      </div>
+    </div>
+  );
+}
 
-      <h2 className="mb-4 mt-10 text-lg font-semibold">Past & Other Bookings</h2>
-      <BookingList bookings={past} loading={loading} onCancel={cancel} emptyText="Nothing here yet." />
+function SectionHeader({
+  title,
+  description,
+  count,
+}: {
+  title: string;
+  description: string;
+  count: number;
+}) {
+  return (
+    <div className="flex items-end justify-between gap-4">
+      <div>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold tracking-tight">{title}</h2>
+
+          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+            {count}
+          </span>
+        </div>
+
+        <p className="mt-1 text-sm text-muted-foreground">
+          {description}
+        </p>
+      </div>
     </div>
   );
 }
@@ -78,38 +224,138 @@ function BookingList({
   onCancel: (id: number) => void;
   emptyText: string;
 }) {
-  if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>;
-  if (bookings.length === 0) return <p className="text-sm text-muted-foreground">{emptyText}</p>;
+  if (loading) {
+    return (
+      <div className="grid gap-4 lg:grid-cols-2">
+        {[1, 2].map((item) => (
+          <div
+            key={item}
+            className="h-40 animate-pulse rounded-2xl border bg-muted/40"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (bookings.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed bg-muted/20 px-6 py-12 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Ticket className="h-5 w-5 text-muted-foreground" />
+        </div>
+
+        <p className="mt-4 font-medium">{emptyText}</p>
+
+        <p className="mt-1 text-sm text-muted-foreground">
+          Your booked events will appear here.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-3">
+    <div className="grid gap-4 lg:grid-cols-2">
       {bookings.map((b) => (
-        <div key={b.id} className="flex items-center gap-4 rounded-xl border border-border p-4">
-          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-            {getEventImageUrl(b.image_url) && <Image src={getEventImageUrl(b.image_url) || ""} alt={b.event_name || ""} fill unoptimized className="object-cover" />}
-          </div>
-          <div className="flex-1">
-            <p className="font-medium">{b.event_name}</p>
-            <p className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-              {b.event_date && (
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(b.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                </span>
-              )}
-              <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" /> {b.location}
-              </span>
-            </p>
-          </div>
-          <Badge className={statusColor[b.status]}>{b.status}</Badge>
-          {b.status === "CONFIRMED" && (
-            <Button variant="outline" size="sm" onClick={() => onCancel(b.id)}>
-              Cancel
-            </Button>
-          )}
-        </div>
+        <BookingCard key={b.id} booking={b} onCancel={onCancel} />
       ))}
     </div>
+  );
+}
+
+function BookingCard({
+  booking: b,
+  onCancel,
+}: {
+  booking: Booking;
+  onCancel: (id: number) => void;
+}) {
+  const imageUrl = getEventImageUrl(b.image_url);
+
+  return (
+    <article className="group overflow-hidden rounded-2xl border bg-background shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+      <div className="flex gap-4 p-4 sm:p-5">
+
+        {/* Image */}
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-muted sm:h-28 sm:w-28">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={b.event_name || "Event"}
+              fill
+              unoptimized
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <Ticket className="h-7 w-7 text-muted-foreground" />
+            </div>
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        </div>
+
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="line-clamp-2 font-semibold leading-snug">
+              {b.event_name}
+            </h3>
+
+            <Badge
+              // variant="outline"
+              className={`shrink-0 text-[11px] font-medium ${statusColor[b.status]}`}
+            >
+              {b.status}
+            </Badge>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            {b.event_date && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                  <Calendar className="h-3.5 w-3.5" />
+                </div>
+
+                <span>
+                  {new Date(b.event_date).toLocaleDateString("en-IN", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
+                <MapPin className="h-3.5 w-3.5" />
+              </div>
+
+              <span className="truncate">{b.location}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      {b.status === "CONFIRMED" && (
+        <div className="flex items-center justify-between border-t bg-muted/20 px-4 py-3 sm:px-5">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock3 className="h-3.5 w-3.5" />
+            Booking confirmed
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => onCancel(b.id)}
+          >
+            Cancel booking
+          </Button>
+        </div>
+      )}
+    </article>
   );
 }
