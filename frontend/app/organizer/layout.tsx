@@ -1,0 +1,10 @@
+import { OrganizerSidebar } from "@/components/OrganizerSidebar";
+
+export default function OrganizerLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mx-auto flex max-w-7xl flex-col sm:flex-row">
+      <OrganizerSidebar />
+      <div className="flex-1 p-4 sm:p-8">{children}</div>
+    </div>
+  );
+}
