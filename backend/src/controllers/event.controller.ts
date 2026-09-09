@@ -33,7 +33,7 @@ export const updateEvent = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const deleteEvent = asyncHandler(async (req: Request, res: Response) => {
-  await eventService.deleteEvent(Number(req.params.id), req.user!.id);
+  await eventService.deleteEvent(Number(req.params.id), req.user!.id, req.user!.role === "ADMIN");
   return success(res, { message: "Event deleted" });
 });
 

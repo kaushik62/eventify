@@ -74,10 +74,16 @@ export default function EventDetailsPage() {
   const imageUrl = getEventImageUrl(event.image_url);
   const total = Number(event.price) * quantity;
   const isSoldOut = event.available_seats === 0;
+  const isOrganizerEvent = Boolean(user && user.role === "ORGANIZER" && event.organizer_id === user.id);
 
   const handleBooking = async () => {
     if (!user) {
       router.push("/login");
+      return;
+    }
+
+    if (isOrganizerEvent) {
+      alert("Organizers cannot book their own events.");
       return;
     }
 
@@ -123,9 +129,13 @@ export default function EventDetailsPage() {
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Something went wrong while creating your booking.");
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Something went wrong while creating your booking.";
+      alert(message);
     } finally {
       setProcessing(false);
     }
@@ -380,15 +390,23 @@ export default function EventDetailsPage() {
                 <Button
                   className="mt-6 h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20"
                   size="lg"
-                  disabled={isSoldOut || processing}
+                  disabled={isSoldOut || processing || isOrganizerEvent}
                   onClick={handleBooking}
                 >
-                  {isSoldOut
+                  {isOrganizerEvent
+                    ? "Own Event"
+                    : isSoldOut
                     ? "Sold Out"
                     : processing
                     ? "Processing…"
                     : "Book Now"}
                 </Button>
+
+                {isOrganizerEvent && (
+                  <p className="mt-3 text-center text-xs text-amber-600">
+                    Organizers cannot book tickets for events they created.
+                  </p>
+                )}
 
                 {/* Trust message */}
                 <div className="mt-5 flex items-start gap-3 rounded-xl bg-muted/50 p-3">

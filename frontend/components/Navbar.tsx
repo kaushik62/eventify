@@ -14,32 +14,32 @@ export function Navbar() {
     user?.role === "ADMIN" ? "/admin" : user?.role === "ORGANIZER" ? "/organizer" : "/dashboard";
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/70 bg-[#fffdf8]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/85 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex items-center gap-2 text-lg font-bold tracking-tight text-slate-900">
-          <span className="grid h-9 w-9 place-items-center rounded-xl gradient-brand text-white shadow-lg shadow-violet-500/20 transition-transform duration-300 group-hover:rotate-6">
+        <Link href="/" className="group flex items-center gap-2 text-lg font-bold tracking-tight text-foreground">
+          <span className="grid h-9 w-9 place-items-center rounded-xl gradient-brand text-white shadow-lg shadow-orange-500/20 transition-transform duration-300 group-hover:rotate-6">
             <CalendarDays className="h-4 w-4" />
           </span>
-          Event<span className="text-violet-700">ify</span>
+          Event<span className="text-primary">ify</span>
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
-          <Link href="/events" className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900">
+          <Link href="/events" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Explore
           </Link>
           {user ? (
             <>
-              <Link href={dashboardLink} className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900">
+              <Link href={dashboardLink} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Dashboard
               </Link>
-              <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">Hi, {user.name.split(" ")[0]}</span>
+              <span className="rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background">Hi, {user.name.split(" ")[0]}</span>
               <Button variant="outline" size="sm" onClick={() => logout()}>
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900">
+              <Link href="/login" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Login
               </Link>
               <Link href="/register">
@@ -49,14 +49,14 @@ export function Navbar() {
           )}
         </div>
 
-        <button className="rounded-lg p-2 transition-colors hover:bg-slate-100 md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+        <button className="rounded-lg p-2 transition-colors hover:bg-muted md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </nav>
 
       {open && (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden">
-          <div className="flex flex-col gap-3 text-sm font-medium text-slate-700">
+        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
+          <div className="flex flex-col gap-3 text-sm font-medium text-foreground">
             <Link href="/events" onClick={() => setOpen(false)}>Explore</Link>
             {user ? (
               <>

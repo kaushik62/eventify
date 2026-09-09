@@ -1,9 +1,18 @@
 -- Eventify Database Schema
 -- Run with: psql $DATABASE_URL -f sql/schema.sql
 
-CREATE TYPE user_role AS ENUM ('USER', 'ORGANIZER', 'ADMIN');
-CREATE TYPE booking_status AS ENUM ('PENDING', 'CONFIRMED', 'CANCELLED', 'FAILED');
-CREATE TYPE payment_status AS ENUM ('CREATED', 'PAID', 'FAILED');
+DO $$ BEGIN
+    CREATE TYPE user_role AS ENUM ('USER', 'ORGANIZER', 'ADMIN');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE booking_status AS ENUM ('PENDING', 'CONFIRMED', 'CANCELLED', 'FAILED');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+    CREATE TYPE payment_status AS ENUM ('CREATED', 'PAID', 'FAILED');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- USERS
 CREATE TABLE IF NOT EXISTS users (
@@ -81,17 +90,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
 CREATE TRIGGER trg_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+DROP TRIGGER IF EXISTS trg_events_updated_at ON events;
 CREATE TRIGGER trg_events_updated_at BEFORE UPDATE ON events
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+DROP TRIGGER IF EXISTS trg_bookings_updated_at ON bookings;
 CREATE TRIGGER trg_bookings_updated_at BEFORE UPDATE ON bookings
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- Seed an admin user (password: Admin@123 — bcrypt hash below, change in production)
--- Hash generated for 'Admin@123'
-INSERT INTO users (name, email, password, role)
-VALUES ('Platform Admin', 'admin@eventify.com', '$2b$10$xWgCYy7HRu2WUeAYFCrQaeNpU54sS4Tui55jVjZ9x8gIwhLJNLAG.', 'ADMIN')
-ON CONFLICT (email) DO NOTHING;
+-- Create the first administrator through a controlled provisioning flow.

@@ -10,7 +10,7 @@ import { CreateBookingInput } from "../schemas/booking.schema";
 export const createBooking = async (userId: number, input: CreateBookingInput) => {
   return withTransaction(async (client) => {
     const eventResult = await client.query(
-      "SELECT id, price, available_seats FROM events WHERE id = $1 FOR UPDATE",
+      "SELECT id, organizer_id, price, available_seats, event_date, event_time FROM events WHERE id = $1 FOR UPDATE",
       [input.eventId]
     );
 
@@ -19,6 +19,15 @@ export const createBooking = async (userId: number, input: CreateBookingInput) =
     }
 
     const event = eventResult.rows[0];
+
+    const eventStart = new Date(`${event.event_date.toISOString().slice(0, 10)}T${event.event_time}`);
+    if (eventStart <= new Date()) {
+      throw new ApiError(400, "This event has already started or ended");
+    }
+
+    if (event.organizer_id === userId) {
+      throw new ApiError(403, "Organizers cannot book their own events");
+    }
 
     if (event.available_seats < input.tickets) {
       throw new ApiError(400, "Not enough seats available");
@@ -46,9 +55,15 @@ export const createBooking = async (userId: number, input: CreateBookingInput) =
 
 export const confirmBooking = async (bookingId: number) => {
   const result = await query(
-    `UPDATE bookings SET status = 'CONFIRMED' WHERE id = $1 RETURNING *`,
+    `UPDATE bookings SET status = 'CONFIRMED'
+     WHERE id = $1 AND status = 'PENDING' RETURNING *`,
     [bookingId]
   );
+  if (result.rows.length === 0) {
+    const existing = await query("SELECT * FROM bookings WHERE id = $1", [bookingId]);
+    if (existing.rows[0]?.status === "CONFIRMED") return existing.rows[0];
+    throw new ApiError(409, "This booking is no longer awaiting payment");
+  }
   return result.rows[0];
 };
 
@@ -56,13 +71,15 @@ export const failBooking = async (bookingId: number) => {
   // Release held seats back to the event when payment fails.
   return withTransaction(async (client) => {
     const bookingResult = await client.query(
-      "SELECT event_id, tickets FROM bookings WHERE id = $1",
+      "SELECT event_id, tickets, status FROM bookings WHERE id = $1 FOR UPDATE",
       [bookingId]
     );
     const booking = bookingResult.rows[0];
     if (!booking) return;
 
-    await client.query("UPDATE bookings SET status = 'FAILED' WHERE id = $1", [bookingId]);
+    if (booking.status !== "PENDING") return booking;
+
+    await client.query("UPDATE bookings SET status = 'FAILED' WHERE id = $1 AND status = 'PENDING'", [bookingId]);
     await client.query(
       "UPDATE events SET available_seats = available_seats + $1 WHERE id = $2",
       [booking.tickets, booking.event_id]
@@ -82,14 +99,15 @@ export const getBookingsByUser = async (userId: number) => {
   return result.rows;
 };
 
-export const getBookingById = async (bookingId: number) => {
+export const getBookingById = async (bookingId: number, userId?: number) => {
+  const ownershipClause = userId === undefined ? "" : " AND b.user_id = $2";
   const result = await query(
     `SELECT b.*, e.name AS event_name, e.event_date, e.event_time, e.location,
             e.image_url, e.organizer_id
      FROM bookings b
      JOIN events e ON e.id = b.event_id
-     WHERE b.id = $1`,
-    [bookingId]
+    WHERE b.id = $1${ownershipClause}`,
+      userId === undefined ? [bookingId] : [bookingId, userId]
   );
   if (result.rows.length === 0) throw new ApiError(404, "Booking not found");
   return result.rows[0];

@@ -117,6 +117,18 @@ export const updateEvent = async (
 ) => {
   await assertOwnership(eventId, organizerId);
 
+  if (input.totalSeats !== undefined) {
+    const soldResult = await query(
+      `SELECT COALESCE(SUM(tickets), 0) AS held_seats
+       FROM bookings WHERE event_id = $1 AND status IN ('PENDING', 'CONFIRMED')`,
+      [eventId]
+    );
+    const heldSeats = Number(soldResult.rows[0].held_seats);
+    if (input.totalSeats < heldSeats) {
+      throw new ApiError(400, `Total seats cannot be lower than ${heldSeats} already reserved seats`);
+    }
+  }
+
   const fields: string[] = [];
   const values: unknown[] = [];
   const fieldMap: Record<string, keyof UpdateEventInput> = {
@@ -141,6 +153,13 @@ export const updateEvent = async (
 
   if (fields.length === 0) {
     return getEventById(eventId);
+  }
+
+  if (input.totalSeats !== undefined) {
+    const current = await query("SELECT total_seats, available_seats FROM events WHERE id = $1", [eventId]);
+    const reserved = Number(current.rows[0].total_seats) - Number(current.rows[0].available_seats);
+    values.push(input.totalSeats - reserved);
+    fields.push(`available_seats = $${values.length}`);
   }
 
   values.push(eventId);

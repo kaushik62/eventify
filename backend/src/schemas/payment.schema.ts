@@ -5,10 +5,9 @@ export const createOrderSchema = z.object({
 });
 
 export const verifyPaymentSchema = z.object({
-  razorpay_order_id: z.string(),
-  razorpay_payment_id: z.string(),
-  razorpay_signature: z.string(),
-  bookingId: z.number().int().positive(),
+  razorpay_order_id: z.string().min(1),
+  razorpay_payment_id: z.string().min(1),
+  razorpay_signature: z.string().length(64),
 });
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;

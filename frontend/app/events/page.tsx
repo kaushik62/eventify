@@ -32,6 +32,7 @@ function EventsContent() {
 
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [search, setSearch] = useState(params.get("search") || "");
   const [category, setCategory] = useState(params.get("category") || "");
@@ -42,6 +43,7 @@ function EventsContent() {
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
+    setError("");
 
     try {
       const res = await api.get("/events", {
@@ -59,6 +61,7 @@ function EventsContent() {
       setEvents(res.data.data.events);
     } catch {
       setEvents([]);
+      setError("We could not load events right now. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -66,8 +69,7 @@ function EventsContent() {
 
   useEffect(() => {
     fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchEvents]);
 
   const clearFilters = () => {
     setSearch("");
@@ -324,6 +326,12 @@ function EventsContent() {
                 <EventSkeleton key={i} />
               ))}
             </div>
+          ) : error ? (
+            <div className="rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-6 py-16 text-center">
+              <h3 className="font-semibold">Unable to load events</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{error}</p>
+              <Button className="mt-5 rounded-xl" onClick={fetchEvents}>Try again</Button>
+            </div>
           ) : events.length === 0 ? (
             <EmptyState onClear={clearFilters} hasFilters={!!hasFilters} />
           ) : (
@@ -412,7 +420,7 @@ function EmptyState({
       </h3>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-        We couldn't find any events matching your current search.
+        We couldn&apos;t find any events matching your current search.
         Try changing your filters or searching for something else.
       </p>
 

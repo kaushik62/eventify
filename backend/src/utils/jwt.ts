@@ -5,7 +5,10 @@ export interface JwtPayload {
   role: "USER" | "ORGANIZER" | "ADMIN";
 }
 
-const JWT_SECRET: Secret = (process.env.JWT_SECRET ?? "eventify-dev-secret") as Secret;
+const JWT_SECRET: Secret = process.env.JWT_SECRET as Secret;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET must be configured before starting the API");
+}
 const JWT_EXPIRES_IN: SignOptions["expiresIn"] =
   (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) ?? "7d";
 

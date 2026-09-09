@@ -22,6 +22,6 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
 
 export const verifyPayment = asyncHandler(async (req: Request, res: Response) => {
   const input = verifyPaymentSchema.parse(req.body);
-  const booking = await paymentService.verifyRazorpayPayment(input);
+  const booking = await paymentService.verifyRazorpayPayment(input, req.user!.id);
   return success(res, booking);
 });

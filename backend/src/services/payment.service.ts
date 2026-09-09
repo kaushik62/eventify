@@ -23,6 +23,10 @@ export const createRazorpayOrder = async (bookingId: number, userId: number) => 
   if (booking.status !== "PENDING") {
     throw new ApiError(400, "This booking is not awaiting payment");
   }
+  if (Date.now() - new Date(booking.created_at).getTime() > 15 * 60 * 1000) {
+    await failBooking(booking.id);
+    throw new ApiError(410, "This booking hold has expired. Please book again.");
+  }
 
   const order = await razorpay.orders.create({
     amount: Math.round(Number(booking.total_amount) * 100), // paise
@@ -43,18 +47,36 @@ export const verifyRazorpayPayment = async (input: {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
-  bookingId: number;
-}) => {
+}, userId: number) => {
+  if (!process.env.RAZORPAY_KEY_SECRET) {
+    throw new ApiError(503, "Payment service is not configured");
+  }
+
+  const paymentResult = await query(
+    `SELECT p.booking_id, p.status AS payment_status, b.user_id, b.status AS booking_status
+     FROM payments p JOIN bookings b ON b.id = p.booking_id
+     WHERE p.razorpay_order_id = $1`,
+    [input.razorpay_order_id]
+  );
+  const payment = paymentResult.rows[0];
+  if (!payment) throw new ApiError(404, "Payment order not found");
+  if (payment.user_id !== userId) throw new ApiError(403, "This payment does not belong to you");
+  if (payment.payment_status === "PAID") return getBookingById(payment.booking_id, userId);
+  if (payment.booking_status !== "PENDING") throw new ApiError(409, "This booking is no longer awaiting payment");
+
   const body = `${input.razorpay_order_id}|${input.razorpay_payment_id}`;
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET as string)
     .update(body)
     .digest("hex");
 
-  const isValid = expectedSignature === input.razorpay_signature;
+  const isValid = crypto.timingSafeEqual(
+    Buffer.from(expectedSignature, "utf8"),
+    Buffer.from(input.razorpay_signature, "utf8")
+  );
 
   if (!isValid) {
-    await failBooking(input.bookingId);
+    await failBooking(payment.booking_id);
     await query(
       "UPDATE payments SET status = 'FAILED' WHERE razorpay_order_id = $1",
       [input.razorpay_order_id]
@@ -67,6 +89,5 @@ export const verifyRazorpayPayment = async (input: {
     [input.razorpay_payment_id, input.razorpay_order_id]
   );
 
-  const booking = await confirmBooking(input.bookingId);
-  return booking;
+  return confirmBooking(payment.booking_id);
 };

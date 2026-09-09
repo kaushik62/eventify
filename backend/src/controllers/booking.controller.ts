@@ -16,7 +16,7 @@ export const listMyBookings = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const getBooking = asyncHandler(async (req: Request, res: Response) => {
-  const booking = await bookingService.getBookingById(Number(req.params.id));
+  const booking = await bookingService.getBookingById(Number(req.params.id), req.user!.id);
   return success(res, booking);
 });
 

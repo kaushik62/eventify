@@ -229,7 +229,7 @@ export default function OrganizerEventsPage() {
               </h3>
 
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                You haven't created any events yet. Create your first event
+                You haven&apos;t created any events yet. Create your first event
                 and start welcoming attendees.
               </p>
 

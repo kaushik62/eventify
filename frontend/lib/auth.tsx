@@ -35,7 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const res = await api.post("/auth/login", { email, password });
-    localStorage.setItem("eventify_token", res.data.data.token);
     setUser(res.data.data.user);
     return res.data.data.user as User;
   };
@@ -47,14 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: "USER" | "ORGANIZER"
   ) => {
     const res = await api.post("/auth/register", { name, email, password, role });
-    localStorage.setItem("eventify_token", res.data.data.token);
     setUser(res.data.data.user);
     return res.data.data.user as User;
   };
 
   const logout = async () => {
     await api.post("/auth/logout");
-    localStorage.removeItem("eventify_token");
     setUser(null);
   };
 

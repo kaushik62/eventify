@@ -48,14 +48,19 @@ export function AIAssistant() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6">
       {open && (
-        <div className="mb-3 flex h-96 w-80 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+        <div
+          role="dialog"
+          aria-label="AI event assistant"
+          aria-modal="false"
+          className="mb-3 flex h-[min(32rem,calc(100vh-7rem))] w-[calc(100vw-2rem)] max-w-80 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+        >
           <div className="flex items-center justify-between gradient-brand p-3 text-white">
             <span className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4" /> AI Assistant
             </span>
-            <button onClick={() => setOpen(false)} aria-label="Close">
+            <button onClick={() => setOpen(false)} aria-label="Close AI Assistant" className="rounded-md p-1 transition hover:bg-white/10">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -81,7 +86,7 @@ export function AIAssistant() {
               placeholder="Ask about events..."
               className="h-9"
             />
-            <Button size="icon" className="h-9 w-9 shrink-0" onClick={send}>
+            <Button size="icon" className="h-9 w-9 shrink-0" onClick={send} aria-label="Send message">
               <Send className="h-4 w-4" />
             </Button>
           </div>

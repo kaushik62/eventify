@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   Search,
@@ -19,6 +20,7 @@ import {
   Ticket,
   ChevronRight,
   Zap,
+  Play,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,6 +41,24 @@ const metrics = [
   { label: "Active events", value: "5k+" },
   { label: "Happy attendees", value: "120k" },
   { label: "Cities covered", value: "42" },
+];
+
+const highlights = [
+  {
+    title: "Curated experiences",
+    description: "Every event is hand-picked to feel exciting, relevant, and worth your time.",
+    icon: Sparkles,
+  },
+  {
+    title: "Fast, secure checkout",
+    description: "Reserve tickets in seconds with a smooth flow and trusted payment support.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "For every vibe",
+    description: "From solo nights to creative meetups, there is always something happening nearby.",
+    icon: Star,
+  },
 ];
 
 export default function HomePage() {
@@ -72,13 +92,13 @@ export default function HomePage() {
       {/* =========================================================
           HERO
       ========================================================== */}
-      <section className="relative isolate overflow-hidden bg-slate-950 text-white">
+      <section className="relative isolate overflow-hidden bg-[#100b22] text-white">
 
         {/* Ambient background */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-15%] top-[-20%] h-[500px] w-[500px] rounded-full bg-violet-600/25 blur-[120px]" />
-          <div className="absolute right-[-10%] top-[15%] h-[450px] w-[450px] rounded-full bg-fuchsia-500/15 blur-[120px]" />
-          <div className="absolute bottom-[-25%] left-[35%] h-[400px] w-[400px] rounded-full bg-indigo-500/15 blur-[110px]" />
+          <div className="absolute left-[-14%] top-[-20%] h-[520px] w-[520px] rounded-full bg-violet-600/30 blur-[120px]" />
+          <div className="absolute right-[-9%] top-[8%] h-[480px] w-[480px] rounded-full bg-fuchsia-500/20 blur-[130px]" />
+          <div className="absolute bottom-[-30%] left-[35%] h-[440px] w-[440px] rounded-full bg-blue-500/15 blur-[110px]" />
         </div>
 
         {/* Grid */}
@@ -86,36 +106,36 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          <div className="grid min-h-[680px] items-center gap-14 py-20 lg:grid-cols-[1.08fr_0.92fr] lg:py-24">
+          <div className="grid min-h-[720px] items-center gap-14 py-16 lg:grid-cols-[1.04fr_0.96fr] lg:py-20">
 
             {/* Hero content */}
             <div className="max-w-3xl">
 
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-white/80 shadow-lg backdrop-blur-xl">
+              <div className="reveal-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-white/80 shadow-lg backdrop-blur-xl">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-500/20">
                   <Sparkles className="h-3 w-3 text-violet-300" />
                 </span>
-                Discover experiences worth showing up for
+                The smarter way to make plans
               </div>
 
               {/* Heading */}
-              <h1 className="mt-7 text-5xl font-black leading-[0.95] tracking-[-0.055em] sm:text-6xl lg:text-7xl xl:text-[82px]">
-                Find your next
+              <h1 className="reveal-up reveal-delay-1 mt-7 text-5xl font-black leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-7xl xl:text-[80px]">
+                The plans you&apos;ll
                 <span className="block bg-gradient-to-r from-white via-violet-200 to-fuchsia-200 bg-clip-text text-transparent">
-                  big experience.
+                  remember start here.
                 </span>
               </h1>
 
-              <p className="mt-7 max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">
-                Discover concerts, workshops, food festivals, sports,
-                conferences, and unforgettable experiences happening near you.
+              <p className="reveal-up reveal-delay-2 mt-7 max-w-xl text-base leading-7 text-white/65 sm:text-lg sm:leading-8">
+                One place for the moments that matter. Discover exceptional events,
+                book in seconds, and go out more often.
               </p>
 
               {/* Search */}
               <form
                 onSubmit={handleSearch}
-                className="mt-9 max-w-3xl rounded-2xl border border-white/10 bg-white/[0.07] p-2 shadow-2xl shadow-black/30 backdrop-blur-xl"
+                className="reveal-up reveal-delay-3 mt-9 max-w-3xl rounded-2xl border border-white/10 bg-white/[0.07] p-2 shadow-2xl shadow-black/30 backdrop-blur-xl"
               >
                 <div className="flex flex-col gap-2 sm:flex-row">
 
@@ -155,7 +175,7 @@ export default function HomePage() {
               </form>
 
               {/* Metrics */}
-              <div className="mt-10 flex flex-wrap gap-x-8 gap-y-5">
+              <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
                 {metrics.map((metric, index) => (
                   <div
                     key={metric.label}
@@ -174,23 +194,33 @@ export default function HomePage() {
                     </p>
                   </div>
                 ))}
+                <div className="flex items-center gap-2 text-xs text-white/55">
+                  <div className="flex -space-x-2">
+                    {["bg-amber-300", "bg-rose-400", "bg-sky-300"].map((color) => (
+                      <span key={color} className={`h-6 w-6 rounded-full border-2 border-[#100b22] ${color}`} />
+                    ))}
+                  </div>
+                  Loved by event-goers
+                </div>
               </div>
             </div>
 
             {/* Featured visual */}
-            <div className="relative mx-auto w-full max-w-md lg:ml-auto">
+            <div className="reveal-up reveal-delay-2 relative mx-auto w-full max-w-[460px] lg:ml-auto">
 
               {/* Glow */}
-              <div className="absolute inset-8 rounded-[3rem] bg-violet-500/20 blur-3xl" />
+              <div className="absolute inset-10 rounded-[3rem] bg-violet-500/25 blur-3xl" />
+              <div className="absolute -inset-8 rounded-full border border-violet-300/10" />
+              <div className="absolute -inset-16 rounded-full border border-violet-300/[0.06]" />
 
-              <div className="relative rounded-[2rem] border border-white/10 bg-white/[0.07] p-3 shadow-2xl shadow-black/40 backdrop-blur-xl">
+              <div className="relative rounded-[2rem] border border-white/15 bg-white/[0.08] p-3 shadow-2xl shadow-black/40 backdrop-blur-xl">
 
                 {/* Top bar */}
                 <div className="flex items-center justify-between px-3 py-3">
                   <div className="flex items-center gap-2 rounded-full bg-white/[0.08] px-3 py-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     <span className="text-[11px] font-semibold text-white/70">
-                      Trending now
+                      Happening this weekend
                     </span>
                   </div>
 
@@ -201,18 +231,28 @@ export default function HomePage() {
                 </div>
 
                 {/* Main feature card */}
-                <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-violet-600 to-indigo-900">
+                <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-violet-600 via-[#6246c5] to-[#121342]">
 
                   {/* Fake visual */}
                   <div className="relative h-64 overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.25),transparent_25%),radial-gradient(circle_at_80%_80%,rgba(217,70,239,.4),transparent_35%)]" />
+                    <Image
+                      src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=85"
+                      alt="Crowd enjoying a live music event"
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 90vw, 460px"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-violet-900/20 to-slate-950/75" />
+                    <div className="absolute -right-8 top-6 h-48 w-48 rounded-full border-[18px] border-white/10" />
+                    <div className="absolute -left-10 bottom-[-80px] h-48 w-48 rounded-full border-[26px] border-fuchsia-300/15" />
 
                     <div className="absolute left-6 top-6 rounded-xl border border-white/20 bg-black/10 px-3 py-2 backdrop-blur-md">
                       <p className="text-[9px] uppercase tracking-[0.2em] text-white/50">
                         Featured
                       </p>
                       <p className="mt-1 text-sm font-bold">
-                        Live Experience
+                        Mumbai&apos;s most-loved night
                       </p>
                     </div>
 
@@ -268,7 +308,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Floating availability */}
-                <div className="absolute -right-5 top-28 rounded-2xl border border-white/10 bg-slate-950/90 p-3 shadow-2xl backdrop-blur-xl">
+                <div className="absolute -right-3 top-28 rounded-2xl border border-white/10 bg-slate-950/90 p-3 shadow-2xl backdrop-blur-xl sm:-right-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-400/10">
                       <Zap className="h-4 w-4 text-emerald-400" />
@@ -279,20 +319,27 @@ export default function HomePage() {
                         Availability
                       </p>
                       <p className="text-xs font-bold text-emerald-300">
-                        18 seats left
+                        18 tickets left
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Floating rating */}
-                <div className="absolute -bottom-4 -left-5 rounded-2xl border border-white/10 bg-slate-950/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
+                <div className="absolute -bottom-5 -left-2 rounded-2xl border border-white/10 bg-slate-950/90 px-4 py-3 shadow-2xl backdrop-blur-xl sm:-left-5">
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 fill-current text-amber-300" />
                     <span className="text-sm font-bold">4.9/5</span>
                     <span className="text-xs text-white/40">
                       attendee rating
                     </span>
+                  </div>
+                </div>
+
+                <div className="absolute -left-5 top-16 hidden rounded-2xl border border-white/10 bg-white/[0.09] px-3 py-2.5 shadow-xl backdrop-blur-xl sm:block">
+                  <div className="flex items-center gap-2 text-xs font-semibold">
+                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/10"><Play className="h-3 w-3 fill-current" /></span>
+                    2,400+ going
                   </div>
                 </div>
               </div>
@@ -356,6 +403,24 @@ export default function HomePage() {
                 </div>
               </div>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
+        <div className="grid gap-4 lg:grid-cols-3">
+          {highlights.map(({ title, description, icon: Icon }) => (
+            <div
+              key={title}
+              className="soft-panel group p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
+                <Icon className="h-5 w-5" />
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold tracking-tight text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+            </div>
           ))}
         </div>
       </section>
