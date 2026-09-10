@@ -92,37 +92,37 @@ export default function HomePage() {
       {/* =========================================================
           HERO
       ========================================================== */}
-      <section className="relative isolate overflow-hidden bg-[#100b22] text-white">
+      <section className="relative isolate overflow-hidden bg-[#182c35] text-white">
 
         {/* Ambient background */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-14%] top-[-20%] h-[520px] w-[520px] rounded-full bg-violet-600/30 blur-[120px]" />
-          <div className="absolute right-[-9%] top-[8%] h-[480px] w-[480px] rounded-full bg-fuchsia-500/20 blur-[130px]" />
-          <div className="absolute bottom-[-30%] left-[35%] h-[440px] w-[440px] rounded-full bg-blue-500/15 blur-[110px]" />
+          <div className="absolute left-[-14%] top-[-20%] h-[520px] w-[520px] rounded-full bg-[#e66c4c]/25 blur-[120px]" />
+          <div className="absolute right-[-9%] top-[8%] h-[480px] w-[480px] rounded-full bg-[#f0a34e]/15 blur-[130px]" />
+          <div className="absolute bottom-[-30%] left-[35%] h-[440px] w-[440px] rounded-full bg-[#5b8f91]/15 blur-[110px]" />
         </div>
 
         {/* Grid */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:48px_48px]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-[88rem] px-4 sm:px-6 lg:px-8">
 
-          <div className="grid min-h-[720px] items-center gap-14 py-16 lg:grid-cols-[1.04fr_0.96fr] lg:py-20">
+          <div className="grid min-h-[680px] items-center gap-14 py-14 lg:grid-cols-[1.04fr_0.96fr] lg:py-16">
 
             {/* Hero content */}
             <div className="max-w-3xl">
 
               {/* Badge */}
               <div className="reveal-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-white/80 shadow-lg backdrop-blur-xl">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-500/20">
-                  <Sparkles className="h-3 w-3 text-violet-300" />
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e66c4c]/20">
+                  <Sparkles className="h-3 w-3 text-[#f0a34e]" />
                 </span>
                 The smarter way to make plans
               </div>
 
               {/* Heading */}
-              <h1 className="reveal-up reveal-delay-1 mt-7 text-5xl font-black leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-7xl xl:text-[80px]">
+              <h1 className="reveal-up reveal-delay-1 mt-7 max-w-2xl text-5xl font-black leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-7xl xl:text-[78px]">
                 The plans you&apos;ll
-                <span className="block bg-gradient-to-r from-white via-violet-200 to-fuchsia-200 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-white via-[#ffd3a8] to-[#f0a34e] bg-clip-text text-transparent">
                   remember start here.
                 </span>
               </h1>
@@ -166,7 +166,7 @@ export default function HomePage() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="h-14 rounded-xl bg-violet-600 px-6 font-semibold text-white shadow-lg shadow-violet-900/30 hover:bg-violet-500"
+                    className="h-14 rounded-xl bg-[#e66c4c] px-6 font-semibold text-white shadow-lg shadow-black/20 hover:bg-[#f07d5b]"
                   >
                     <Search className="mr-2 h-4 w-4" />
                     Explore
@@ -209,9 +209,9 @@ export default function HomePage() {
             <div className="reveal-up reveal-delay-2 relative mx-auto w-full max-w-[460px] lg:ml-auto">
 
               {/* Glow */}
-              <div className="absolute inset-10 rounded-[3rem] bg-violet-500/25 blur-3xl" />
-              <div className="absolute -inset-8 rounded-full border border-violet-300/10" />
-              <div className="absolute -inset-16 rounded-full border border-violet-300/[0.06]" />
+              <div className="absolute inset-10 rounded-[3rem] bg-[#e66c4c]/25 blur-3xl" />
+              <div className="absolute -inset-8 rounded-full border border-[#f0a34e]/10" />
+              <div className="absolute -inset-16 rounded-full border border-[#f0a34e]/[0.06]" />
 
               <div className="relative rounded-[2rem] border border-white/15 bg-white/[0.08] p-3 shadow-2xl shadow-black/40 backdrop-blur-xl">
 
@@ -231,7 +231,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Main feature card */}
-                <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-violet-600 via-[#6246c5] to-[#121342]">
+                <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-[#e66c4c] via-[#b94f4d] to-[#182c35]">
 
                   {/* Fake visual */}
                   <div className="relative h-64 overflow-hidden">
@@ -243,9 +243,9 @@ export default function HomePage() {
                       sizes="(max-width: 1024px) 90vw, 460px"
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-violet-900/20 to-slate-950/75" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#182c35]/20 via-[#182c35]/20 to-[#182c35]/85" />
                     <div className="absolute -right-8 top-6 h-48 w-48 rounded-full border-[18px] border-white/10" />
-                    <div className="absolute -left-10 bottom-[-80px] h-48 w-48 rounded-full border-[26px] border-fuchsia-300/15" />
+                    <div className="absolute -left-10 bottom-[-80px] h-48 w-48 rounded-full border-[26px] border-[#f0a34e]/20" />
 
                     <div className="absolute left-6 top-6 rounded-xl border border-white/20 bg-black/10 px-3 py-2 backdrop-blur-md">
                       <p className="text-[9px] uppercase tracking-[0.2em] text-white/50">
@@ -276,12 +276,12 @@ export default function HomePage() {
 
                     <div className="space-y-3 text-sm text-white/70">
                       <div className="flex items-center gap-3">
-                        <CalendarRange className="h-4 w-4 text-violet-300" />
+                        <CalendarRange className="h-4 w-4 text-[#f0a34e]" />
                         Sat, 12 Sep · 7:30 PM
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <MapPin className="h-4 w-4 text-violet-300" />
+                        <MapPin className="h-4 w-4 text-[#f0a34e]" />
                         Jio Gardens, Mumbai
                       </div>
                     </div>
@@ -351,7 +351,7 @@ export default function HomePage() {
       {/* =========================================================
           CATEGORY SECTION
       ========================================================== */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
+      <section className="mx-auto max-w-[88rem] px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
 
         <div className="flex items-end justify-between gap-6">
           <div>
@@ -407,7 +407,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-[88rem] px-4 pb-6 sm:px-6 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-3">
           {highlights.map(({ title, description, icon: Icon }) => (
             <div
@@ -429,7 +429,7 @@ export default function HomePage() {
           FEATURED EVENTS
       ========================================================== */}
       <section className="bg-muted/30 py-20 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[88rem] px-4 sm:px-6 lg:px-8">
 
           <div className="flex items-end justify-between gap-6">
             <div>
@@ -471,7 +471,7 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {events.map((event) => (
                 <div
                   key={event.id}
@@ -490,13 +490,13 @@ export default function HomePage() {
       ========================================================== */}
       <section className="relative overflow-hidden bg-slate-950 py-20 text-white lg:py-24">
 
-        <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-violet-600/10 blur-[100px]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-[#e66c4c]/10 blur-[100px]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-[88rem] px-4 sm:px-6 lg:px-8">
 
           <div className="mx-auto max-w-2xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/60">
-              <Zap className="h-3.5 w-3.5 text-violet-300" />
+              <Zap className="h-3.5 w-3.5 text-[#f0a34e]" />
               Simple by design
             </div>
 
@@ -535,7 +535,7 @@ export default function HomePage() {
                 className="group rounded-3xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.07]"
               >
                 <div className="flex items-center justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-500/10 text-sm font-bold text-violet-300">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#e66c4c]/10 text-sm font-bold text-[#f0a34e]">
                     {item.step}
                   </span>
 
@@ -559,11 +559,11 @@ export default function HomePage() {
           CTA
       ========================================================== */}
       <section className="px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-violet-600 via-violet-700 to-indigo-900 px-6 py-12 text-white shadow-2xl shadow-violet-500/15 sm:px-10 lg:px-14 lg:py-14">
+        <div className="relative mx-auto max-w-[88rem] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#284d59] via-[#1f3b46] to-[#182c35] px-6 py-12 text-white shadow-2xl shadow-[#182c35]/20 sm:px-10 lg:px-14 lg:py-14">
 
           {/* Decorative circles */}
           <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-white/10 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-[#e66c4c]/15 blur-2xl" />
 
           <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
 
@@ -586,7 +586,7 @@ export default function HomePage() {
             <Link href="/events" className="shrink-0">
               <Button
                 size="lg"
-                className="h-12 rounded-xl bg-white px-6 font-semibold text-violet-700 shadow-xl hover:bg-white/90"
+                className="h-12 rounded-xl bg-[#f0a34e] px-6 font-semibold text-[#182c35] shadow-xl hover:bg-[#ffc06b]"
               >
                 Explore events
                 <ArrowRight className="ml-2 h-4 w-4" />

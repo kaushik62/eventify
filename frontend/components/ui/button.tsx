@@ -10,10 +10,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  default: "bg-primary text-primary-foreground hover:opacity-90",
-  outline: "border border-border bg-transparent hover:bg-muted",
-  ghost: "bg-transparent hover:bg-muted",
-  secondary: "bg-muted text-foreground hover:bg-muted/80",
+  default: "bg-primary text-primary-foreground shadow-[0_10px_20px_-10px_hsl(var(--primary)/0.9)] hover:bg-primary/90",
+  outline: "border border-border/90 bg-card/70 hover:border-primary/30 hover:bg-primary/5",
+  ghost: "bg-transparent hover:bg-primary/8",
+  secondary: "bg-muted text-foreground hover:bg-muted/75",
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -29,7 +29,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-lg font-semibold tracking-[-0.01em] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0",
+          "inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-[-0.01em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0",
           variantClasses[variant],
           sizeClasses[size],
           className

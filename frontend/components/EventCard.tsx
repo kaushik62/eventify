@@ -15,8 +15,8 @@ export function EventCard({ event }: { event: EventItem }) {
   const isAlmostFull = seatsLeft > 0 && seatsLeft <= 10;
 
   return (
-    <div className="card-hover group block overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-sm">
-      <div className="relative h-56 w-full overflow-hidden bg-muted">
+    <article className="card-hover group block h-full overflow-hidden rounded-[1.6rem] border border-border/75 bg-gradient-to-br from-card via-card to-orange-50/60 shadow-[0_18px_42px_-28px_rgba(24,44,53,0.52)]">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
         {getEventImageUrl(event.image_url) ? (
           <Image
             src={getEventImageUrl(event.image_url) || ""}
@@ -34,19 +34,19 @@ export function EventCard({ event }: { event: EventItem }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
 
-        <Badge className="absolute left-3 top-3 border-0 bg-white/90 text-foreground shadow-sm">
+        <Badge className="absolute left-4 top-4 border border-white/60 bg-white/90 text-foreground shadow-sm backdrop-blur-md">
           {event.category}
         </Badge>
 
         {isAlmostFull && (
-          <Badge className="absolute right-12 top-3 border-0 bg-amber-400/95 text-amber-950 shadow-sm">
+          <Badge className="absolute right-14 top-4 border-0 bg-amber-400/95 text-amber-950 shadow-sm">
             Limited
           </Badge>
         )}
 
         <button
           onClick={(e) => e.preventDefault()}
-          className="absolute right-3 top-3 z-20 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-foreground shadow-sm transition hover:scale-105"
+          className="absolute right-4 top-4 z-20 grid h-9 w-9 place-items-center rounded-full border border-white/60 bg-white/90 text-foreground shadow-sm backdrop-blur-md transition hover:scale-105 hover:text-primary"
           aria-label="Favorite"
         >
           <Heart className="h-4 w-4" />
@@ -54,7 +54,7 @@ export function EventCard({ event }: { event: EventItem }) {
 
         <Link href={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View ${event.name}`} />
 
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3 text-white">
+        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4 text-white">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-white/70">{date}</p>
             <p className="mt-1 text-xs text-white/80">{seatsLeft} seats left</p>
@@ -66,23 +66,23 @@ export function EventCard({ event }: { event: EventItem }) {
         </div>
       </div>
 
-      <Link href={`/events/${event.id}`} className="block space-y-3 p-5">
+      <Link href={`/events/${event.id}`} className="block space-y-5 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">{date}</p>
-            <h3 className="mt-1 line-clamp-1 text-base font-bold text-foreground">{event.name}</h3>
+            <h3 className="mt-1 line-clamp-2 text-xl font-bold leading-tight tracking-[-0.025em] text-foreground">{event.name}</h3>
           </div>
         </div>
 
-        <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3 shrink-0" />
+        <p className="flex min-h-5 items-center gap-1.5 truncate text-sm text-muted-foreground">
+          <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
           {event.location}
         </p>
 
-        <div className="flex items-center justify-between border-t border-border/70 pt-3">
+        <div className="flex items-center justify-between border-t border-border/70 pt-4">
           <div>
             <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">From</p>
-            <span className="text-sm font-bold text-foreground">
+            <span className="text-base font-bold text-foreground">
               ₹{Number(event.price).toLocaleString("en-IN")}
             </span>
           </div>
@@ -93,6 +93,6 @@ export function EventCard({ event }: { event: EventItem }) {
           </div>
         </div>
       </Link>
-    </div>
+    </article>
   );
 }

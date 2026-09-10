@@ -61,7 +61,7 @@ export default function EventDetailsPage() {
   if (!event) {
     return (
       <main className="min-h-screen bg-muted/20">
-        <div className="mx-auto max-w-7xl px-4 py-24 text-center">
+        <div className="mx-auto max-w-[88rem] px-4 py-24 text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           <p className="mt-4 text-sm text-muted-foreground">
             Loading event…
@@ -143,7 +143,7 @@ export default function EventDetailsPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <div className="mx-auto max-w-[88rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
 
         {/* Back button */}
         <button
@@ -266,7 +266,7 @@ export default function EventDetailsPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                   {related.map((r) => (
                     <EventCard key={r.id} event={r} />
                   ))}

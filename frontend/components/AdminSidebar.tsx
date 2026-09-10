@@ -16,15 +16,15 @@ const links = [
 export function AdminSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-full shrink-0 border-b border-border p-4 sm:w-56 sm:border-b-0 sm:border-r sm:p-6">
+    <aside className="w-full shrink-0 border-b border-border/70 bg-card/35 p-4 backdrop-blur-sm sm:w-64 sm:border-b-0 sm:border-r sm:p-5">
       <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:gap-1 sm:overflow-visible">
         {links.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted",
-              pathname === href && "bg-primary/10 text-primary"
+              "flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-primary/7 hover:text-foreground",
+              pathname === href && "bg-primary text-primary-foreground shadow-[0_8px_18px_-10px_hsl(var(--primary)/0.9)]"
             )}
           >
             <Icon className="h-4 w-4" /> {label}

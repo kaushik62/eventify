@@ -20,11 +20,6 @@ export const getBooking = asyncHandler(async (req: Request, res: Response) => {
   return success(res, booking);
 });
 
-export const cancelBooking = asyncHandler(async (req: Request, res: Response) => {
-  const booking = await bookingService.cancelBooking(Number(req.params.id), req.user!.id);
-  return success(res, booking);
-});
-
 export const eventBookings = asyncHandler(async (req: Request, res: Response) => {
   const bookings = await bookingService.getBookingsForOrganizerEvent(
     Number(req.params.eventId),

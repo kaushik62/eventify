@@ -85,7 +85,7 @@ function EventsContent() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+      <div className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
         {/* Hero */}
         <section className="relative overflow-hidden rounded-3xl border bg-background shadow-sm">
@@ -321,7 +321,7 @@ function EventsContent() {
         {/* Results */}
         <section className="mt-5">
           {loading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 8 }).map((_, i) => (
                 <EventSkeleton key={i} />
               ))}
@@ -335,7 +335,7 @@ function EventsContent() {
           ) : events.length === 0 ? (
             <EmptyState onClear={clearFilters} hasFilters={!!hasFilters} />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {events.map((event, index) => (
                 <div
                   key={event.id}
@@ -443,7 +443,7 @@ export default function EventsPage() {
     <Suspense
       fallback={
         <main className="min-h-screen bg-muted/20">
-          <div className="mx-auto max-w-7xl px-4 py-24 text-center">
+          <div className="mx-auto max-w-[88rem] px-4 py-24 text-center">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             <p className="mt-4 text-sm text-muted-foreground">
               Loading events…

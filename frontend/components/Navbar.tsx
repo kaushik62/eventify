@@ -14,10 +14,10 @@ export function Navbar() {
     user?.role === "ADMIN" ? "/admin" : user?.role === "ORGANIZER" ? "/organizer" : "/dashboard";
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/85 backdrop-blur-xl">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 shadow-[0_8px_30px_-25px_rgba(24,44,53,0.45)] backdrop-blur-2xl">
+      <nav className="mx-auto flex h-[4.75rem] max-w-[88rem] items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group flex items-center gap-2 text-lg font-bold tracking-tight text-foreground">
-          <span className="grid h-9 w-9 place-items-center rounded-xl gradient-brand text-white shadow-lg shadow-orange-500/20 transition-transform duration-300 group-hover:rotate-6">
+          <span className="grid h-10 w-10 place-items-center rounded-xl gradient-brand text-white shadow-lg shadow-[#182c35]/20 transition-transform duration-300 group-hover:rotate-6">
             <CalendarDays className="h-4 w-4" />
           </span>
           Event<span className="text-primary">ify</span>
@@ -32,7 +32,7 @@ export function Navbar() {
               <Link href={dashboardLink} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Dashboard
               </Link>
-              <span className="rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background">Hi, {user.name.split(" ")[0]}</span>
+              <span className="rounded-full bg-foreground px-3.5 py-1.5 text-xs font-semibold text-background shadow-sm">Hi, {user.name.split(" ")[0]}</span>
               <Button variant="outline" size="sm" onClick={() => logout()}>
                 Logout
               </Button>
@@ -55,7 +55,7 @@ export function Navbar() {
       </nav>
 
       {open && (
-        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
+        <div className="border-t border-border/70 bg-background/95 px-4 py-5 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-3 text-sm font-medium text-foreground">
             <Link href="/events" onClick={() => setOpen(false)}>Explore</Link>
             {user ? (

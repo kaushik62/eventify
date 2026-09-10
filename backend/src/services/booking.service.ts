@@ -113,28 +113,6 @@ export const getBookingById = async (bookingId: number, userId?: number) => {
   return result.rows[0];
 };
 
-export const cancelBooking = async (bookingId: number, userId: number) => {
-  return withTransaction(async (client) => {
-    const bookingResult = await client.query(
-      "SELECT * FROM bookings WHERE id = $1 AND user_id = $2 FOR UPDATE",
-      [bookingId, userId]
-    );
-    const booking = bookingResult.rows[0];
-    if (!booking) throw new ApiError(404, "Booking not found");
-    if (booking.status !== "CONFIRMED") {
-      throw new ApiError(400, "Only confirmed bookings can be cancelled");
-    }
-
-    await client.query("UPDATE bookings SET status = 'CANCELLED' WHERE id = $1", [bookingId]);
-    await client.query(
-      "UPDATE events SET available_seats = available_seats + $1 WHERE id = $2",
-      [booking.tickets, booking.event_id]
-    );
-
-    return { ...booking, status: "CANCELLED" };
-  });
-};
-
 export const getBookingsForOrganizerEvent = async (eventId: number, organizerId: number) => {
   const eventCheck = await query("SELECT organizer_id FROM events WHERE id = $1", [eventId]);
   if (eventCheck.rows.length === 0) throw new ApiError(404, "Event not found");

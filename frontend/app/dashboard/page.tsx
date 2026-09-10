@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Calendar,
   MapPin,
@@ -12,7 +13,6 @@ import {
 } from "lucide-react";
 
 import { getEventImageUrl } from "@/lib/image";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import api from "@/lib/api";
 import { Booking } from "@/lib/types";
@@ -56,16 +56,13 @@ export default function DashboardPage() {
 
   const past = bookings.filter((b) => !upcoming.includes(b));
 
-  const cancel = async (id: number) => {
-    if (!confirm("Cancel this booking?")) return;
-
-    await api.delete(`/bookings/${id}`);
-    load();
-  };
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#fff8f2] via-background to-[#edf5f3]">
+      <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(24,44,53,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(24,44,53,.035)_1px,transparent_1px)] [background-size:42px_42px]" />
+      <div className="pointer-events-none absolute -left-40 top-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-40 bottom-20 h-[28rem] w-[28rem] rounded-full bg-teal-500/10 blur-3xl" />
+
+      <div className="relative mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
         {/* Header */}
         <section className="relative overflow-hidden rounded-3xl border bg-background p-6 shadow-sm sm:p-8">
@@ -127,7 +124,6 @@ export default function DashboardPage() {
             <BookingList
               bookings={upcoming}
               loading={loading}
-              onCancel={cancel}
               emptyText="No upcoming bookings yet."
             />
           </div>
@@ -145,7 +141,6 @@ export default function DashboardPage() {
             <BookingList
               bookings={past}
               loading={loading}
-              onCancel={cancel}
               emptyText="Nothing here yet."
             />
           </div>
@@ -216,12 +211,10 @@ function SectionHeader({
 function BookingList({
   bookings,
   loading,
-  onCancel,
   emptyText,
 }: {
   bookings: Booking[];
   loading: boolean;
-  onCancel: (id: number) => void;
   emptyText: string;
 }) {
   if (loading) {
@@ -256,7 +249,7 @@ function BookingList({
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {bookings.map((b) => (
-        <BookingCard key={b.id} booking={b} onCancel={onCancel} />
+        <BookingCard key={b.id} booking={b} />
       ))}
     </div>
   );
@@ -264,15 +257,17 @@ function BookingList({
 
 function BookingCard({
   booking: b,
-  onCancel,
 }: {
   booking: Booking;
-  onCancel: (id: number) => void;
 }) {
   const imageUrl = getEventImageUrl(b.image_url);
 
   return (
-    <article className="group overflow-hidden rounded-2xl border bg-background shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+    <Link
+      href={`/booking/confirmation/${b.id}`}
+      aria-label={`View booking details for ${b.event_name || "your event"}`}
+      className="group block h-full overflow-hidden rounded-2xl border border-border/80 bg-card/90 shadow-[0_18px_42px_-30px_rgba(24,44,53,0.55)] backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_24px_48px_-26px_rgba(24,44,53,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+    >
       <div className="flex gap-4 p-4 sm:p-5">
 
         {/* Image */}
@@ -345,17 +340,11 @@ function BookingCard({
             <Clock3 className="h-3.5 w-3.5" />
             Booking confirmed
           </div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={() => onCancel(b.id)}
-          >
-            Cancel booking
-          </Button>
+          <span className="text-xs font-semibold text-primary transition-transform group-hover:translate-x-0.5">
+            View ticket <span aria-hidden="true">-&gt;</span>
+          </span>
         </div>
       )}
-    </article>
+    </Link>
   );
 }

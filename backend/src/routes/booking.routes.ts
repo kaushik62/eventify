@@ -7,6 +7,5 @@ const router = Router();
 router.post("/", authenticateUser, bookingController.createBooking);
 router.get("/", authenticateUser, bookingController.listMyBookings);
 router.get("/:id", authenticateUser, bookingController.getBooking);
-router.delete("/:id", authenticateUser, bookingController.cancelBooking);
 
 export default router;
