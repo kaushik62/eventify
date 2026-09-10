@@ -16,7 +16,7 @@ const links = [
 export function OrganizerSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-full shrink-0 border-b border-border/70 bg-card/35 p-4 backdrop-blur-sm sm:w-64 sm:border-b-0 sm:border-r sm:p-5">
+    <aside className="w-full shrink-0 border-b border-white/10 bg-white/[0.035] p-4 backdrop-blur-xl sm:w-64 sm:border-b-0 sm:border-r sm:p-5">
       <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:gap-1 sm:overflow-visible">
         {links.map(({ href, label, icon: Icon }) => (
           <Link

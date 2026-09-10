@@ -92,7 +92,7 @@ export default function CreateEventPage() {
 
       <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="soft-panel space-y-5 p-5 sm:p-7">
-          {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}
+          {error && <p className="rounded-lg border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-300">{error}</p>}
 
         <div>
           <label className="mb-1.5 block text-sm font-medium">Event name</label>
@@ -107,7 +107,7 @@ export default function CreateEventPage() {
             rows={4}
             value={form.description}
             onChange={(e) => update("description", e.target.value)}
-            className="w-full rounded-lg border border-border p-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="glass-input w-full p-3 text-sm"
           />
         </div>
 

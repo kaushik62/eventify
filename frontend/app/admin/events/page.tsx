@@ -72,7 +72,7 @@ export default function AdminEventsPage() {
       return {
         label: "Past",
         className:
-          "bg-slate-500/10 text-slate-600 ring-1 ring-inset ring-slate-500/20",
+          "bg-white/[0.05] text-white/60 ring-1 ring-inset ring-white/10",
       };
     }
 
@@ -80,19 +80,19 @@ export default function AdminEventsPage() {
       return {
         label: "Sold out",
         className:
-          "bg-red-500/10 text-red-600 ring-1 ring-inset ring-red-500/20",
+          "bg-red-400/10 text-red-300 ring-1 ring-inset ring-red-400/20",
       };
     }
 
     return {
       label: "Upcoming",
       className:
-        "bg-emerald-500/10 text-emerald-600 ring-1 ring-inset ring-emerald-500/20",
+        "bg-emerald-400/10 text-emerald-300 ring-1 ring-inset ring-emerald-400/20",
     };
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="page-surface min-h-screen">
       <div className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -154,7 +154,7 @@ export default function AdminEventsPage() {
                 </p>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
                 <CalendarDays className="h-5 w-5" />
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function AdminEventsPage() {
                 </p>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
                 <Ticket className="h-5 w-5" />
               </div>
             </div>

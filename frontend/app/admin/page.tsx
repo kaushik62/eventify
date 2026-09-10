@@ -37,21 +37,21 @@ export default function AdminDashboardPage() {
       value: stats?.totalOrganizers,
       icon: UserRoundCog,
       description: "Event creators",
-      iconClass: "bg-violet-500/10 text-violet-600",
+      iconClass: "bg-violet-500/10 text-violet-400",
     },
     {
       label: "Total Events",
       value: stats?.totalEvents,
       icon: CalendarDays,
       description: "Events on platform",
-      iconClass: "bg-emerald-500/10 text-emerald-600",
+      iconClass: "bg-emerald-500/10 text-emerald-400",
     },
     {
       label: "Total Bookings",
       value: stats?.totalBookings,
       icon: Ticket,
       description: "Tickets booked",
-      iconClass: "bg-amber-500/10 text-amber-600",
+      iconClass: "bg-amber-500/10 text-amber-400",
     },
   ];
 
@@ -66,10 +66,10 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="page-surface min-h-screen">
       <div className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+        <div className="premium-panel relative overflow-hidden p-7 sm:p-9">
           <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
           <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
 
@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
                     <IndianRupee className="h-5 w-5" />
                   </div>
 
@@ -154,7 +154,7 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
 
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
                 <TrendingUp className="h-7 w-7" />
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function AdminDashboardPage() {
 
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
                 <CalendarDays className="h-5 w-5" />
               </div>
 

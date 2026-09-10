@@ -53,7 +53,7 @@ export default function BookingConfirmationPage() {
   );
 
   return (
-    <div className="relative min-h-[calc(100vh-5rem)] overflow-hidden bg-background">
+    <div className="page-surface relative min-h-[calc(100vh-5rem)] overflow-hidden">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
@@ -67,12 +67,12 @@ export default function BookingConfirmationPage() {
           <div className="relative mx-auto mb-7 flex h-20 w-20 items-center justify-center">
             <div className="absolute inset-0 rounded-full bg-emerald-500/10 blur-xl" />
 
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 shadow-sm">
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10 text-emerald-300 shadow-sm">
               <CheckCircle2 className="h-10 w-10" strokeWidth={2} />
             </div>
           </div>
 
-          <div className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600">
+          <div className="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-400/5 px-3 py-1 text-xs font-semibold text-emerald-300">
             {isConfirmed ? "Payment successful" : "Booking received"}
           </div>
 
@@ -90,9 +90,9 @@ export default function BookingConfirmationPage() {
         </div>
 
         {/* Booking Card */}
-        <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-card shadow-xl shadow-black/5">
+        <div className="glass-strong mt-10 overflow-hidden">
           {/* Card Header */}
-          <div className="border-b border-border bg-muted/30 p-6 sm:p-8">
+          <div className="border-b border-white/10 bg-white/[0.03] p-7 sm:p-8">
             <div className="flex items-start justify-between gap-5">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -107,8 +107,8 @@ export default function BookingConfirmationPage() {
               <div
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${
                   isConfirmed
-                    ? "bg-emerald-500/10 text-emerald-600 ring-1 ring-inset ring-emerald-500/20"
-                    : "bg-amber-500/10 text-amber-600 ring-1 ring-inset ring-amber-500/20"
+                    ? "bg-emerald-400/10 text-emerald-300 ring-1 ring-inset ring-emerald-400/20"
+                    : "bg-amber-400/10 text-amber-300 ring-1 ring-inset ring-amber-400/20"
                 }`}
               >
                 {booking.status}
@@ -138,7 +138,7 @@ export default function BookingConfirmationPage() {
 
             <div className="bg-card p-6">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
                   <MapPin className="h-5 w-5" />
                 </div>
 
@@ -181,7 +181,7 @@ export default function BookingConfirmationPage() {
                   Booking ID
                 </span>
 
-                <span className="rounded-md bg-muted px-2.5 py-1 font-mono text-xs font-semibold">
+                <span className="rounded-md border border-white/10 bg-white/[0.05] px-2.5 py-1 font-mono text-xs font-semibold">
                   EVT-{String(booking.id).padStart(6, "0")}
                 </span>
               </div>
@@ -209,7 +209,7 @@ export default function BookingConfirmationPage() {
         </div>
 
         {/* Confirmation Note */}
-        <div className="mt-5 rounded-2xl border border-border bg-card/70 p-4">
+        <div className="glass mt-5 p-5">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Clock3 className="h-4 w-4" />

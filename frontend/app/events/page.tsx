@@ -84,16 +84,16 @@ function EventsContent() {
     search || category || location || minPrice || maxPrice;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
+    <main className="page-surface min-h-screen">
       <div className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
 
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-3xl border bg-background shadow-sm">
+        <section className="premium-panel relative overflow-hidden">
           <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
           <div className="absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-violet-500/10 blur-3xl" />
 
           <div className="relative px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-            <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               The Eventify edit
             </div>
@@ -111,7 +111,7 @@ function EventsContent() {
                 </p>
               </div>
 
-              <div className="flex w-fit items-center gap-2 rounded-2xl border bg-background px-4 py-3 shadow-sm">
+              <div className="glass flex w-fit items-center gap-2 px-5 py-3.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <Tag className="h-4 w-4 text-primary" />
                 </div>
@@ -153,7 +153,7 @@ function EventsContent() {
             e.preventDefault();
             fetchEvents();
           }}
-          className="mt-5 rounded-3xl border bg-background p-4 shadow-sm sm:p-5"
+          className="glass mt-5 p-5 sm:p-6"
         >
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-primary" />
@@ -189,7 +189,7 @@ function EventsContent() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="h-11 w-full appearance-none rounded-xl border border-border bg-background pl-9 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="glass-input h-11 w-full appearance-none pl-9 pr-3 text-sm"
               >
                 <option value="">All categories</option>
 
@@ -240,7 +240,7 @@ function EventsContent() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="h-11 w-full appearance-none rounded-xl border border-border bg-background pl-9 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="glass-input h-11 w-full appearance-none pl-9 pr-3 text-sm"
               >
                 <option value="date_asc">
                   Date: Soonest first
@@ -321,7 +321,7 @@ function EventsContent() {
         {/* Results */}
         <section className="mt-5">
           {loading ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 8 }).map((_, i) => (
                 <EventSkeleton key={i} />
               ))}
@@ -335,7 +335,7 @@ function EventsContent() {
           ) : events.length === 0 ? (
             <EmptyState onClear={clearFilters} hasFilters={!!hasFilters} />
           ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 xl:grid-cols-3">
               {events.map((event, index) => (
                 <div
                   key={event.id}
@@ -370,8 +370,8 @@ function CategoryButton({
       onClick={onClick}
       className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
         active
-          ? "border-primary bg-primary text-primary-foreground shadow-sm"
-          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          ? "border-primary/30 bg-primary text-primary-foreground shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.5)]"
+          : "border-white/10 bg-white/[0.04] text-muted-foreground backdrop-blur-sm hover:border-primary/30 hover:bg-white/[0.07] hover:text-foreground"
       }`}
     >
       {label}
@@ -381,7 +381,7 @@ function CategoryButton({
 
 function FilterPill({ label }: { label: string }) {
   return (
-    <span className="rounded-full border bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+    <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur-sm">
       {label}
     </span>
   );
@@ -389,14 +389,14 @@ function FilterPill({ label }: { label: string }) {
 
 function EventSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border bg-background">
-      <div className="h-48 animate-pulse bg-muted" />
+    <div className="glass overflow-hidden">
+      <div className="h-48 animate-pulse bg-white/[0.04]" />
 
-      <div className="space-y-3 p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
-        <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
-        <div className="mt-4 h-8 w-1/3 animate-pulse rounded bg-muted" />
+      <div className="space-y-3 p-6">
+        <div className="h-4 w-3/4 animate-pulse rounded bg-white/[0.06]" />
+        <div className="h-3 w-1/2 animate-pulse rounded bg-white/[0.06]" />
+        <div className="h-3 w-2/3 animate-pulse rounded bg-white/[0.06]" />
+        <div className="mt-4 h-8 w-1/3 animate-pulse rounded bg-white/[0.06]" />
       </div>
     </div>
   );
@@ -410,8 +410,8 @@ function EmptyState({
   hasFilters: boolean;
 }) {
   return (
-    <div className="rounded-3xl border border-dashed bg-muted/20 px-6 py-20 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+    <div className="glass rounded-3xl border-dashed px-6 py-20 text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05]">
         <Search className="h-6 w-6 text-muted-foreground" />
       </div>
 
@@ -442,7 +442,7 @@ export default function EventsPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-muted/20">
+        <main className="page-surface min-h-screen">
           <div className="mx-auto max-w-[88rem] px-4 py-24 text-center">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             <p className="mt-4 text-sm text-muted-foreground">

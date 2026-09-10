@@ -45,7 +45,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-gradient-to-b from-muted/30 via-background to-background">
+    <main className="page-surface relative min-h-[calc(100vh-4rem)] overflow-hidden">
       {/* Background decoration */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
@@ -60,7 +60,7 @@ export default function LoginPage() {
           <div className="max-w-xl">
 
             {/* Brand badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3.5 py-2 text-xs font-semibold shadow-sm backdrop-blur">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3.5 py-2 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               Welcome to Eventify
             </div>
@@ -104,7 +104,7 @@ export default function LoginPage() {
 
         {/* Right: Login */}
         <section className="mx-auto w-full max-w-md">
-          <div className="rounded-3xl border bg-background/95 p-6 shadow-2xl shadow-primary/5 backdrop-blur-xl sm:p-8">
+          <div className="glass-strong p-7 sm:p-9">
 
             {/* Mobile logo / heading */}
             <div className="mb-8 text-center lg:text-left">
@@ -125,7 +125,7 @@ export default function LoginPage() {
             {error && (
               <div
                 role="alert"
-                className="mb-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+                className="mb-5 rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300"
               >
                 <p className="font-medium">Unable to sign in</p>
                 <p className="mt-1 text-xs opacity-90">{error}</p>
@@ -255,7 +255,7 @@ function Feature({
   description: string;
 }) {
   return (
-    <div className="group flex items-center gap-4 rounded-2xl border bg-background/70 p-4 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <div className="glass card-hover group flex items-center gap-4 p-5">
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-200 group-hover:scale-105">
         {icon}
       </div>

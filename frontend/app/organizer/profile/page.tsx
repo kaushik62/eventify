@@ -1,183 +1,184 @@
 "use client";
 
-import { CalendarDays, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  User,
+  Mail,
+  Shield,
+  CalendarDays,
+  Edit3,
+  KeyRound,
+  CheckCircle2,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function OrganizerProfilePage() {
   const { user } = useAuth();
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
+  if (!user) return null;
 
-    return name
-      .split(" ")
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
+  const joinDate = new Date(user.created_at).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const initials = user.name
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-4xl space-y-8 p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div>
-          <p className="mb-2 text-sm font-medium text-primary">
-            Organizer dashboard
-          </p>
-
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Profile
-          </h1>
-
-          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Manage and view your Eventify organizer account information.
-          </p>
+    <div className="max-w-3xl">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+          <Sparkles className="h-3.5 w-3.5" />
+          Your organizer profile
         </div>
+        <h1 className="text-3xl font-bold tracking-tight">Profile & Settings</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Manage your account information and preferences.
+        </p>
+      </div>
 
-        {/* Profile Hero */}
-        <Card className="relative overflow-hidden border-border shadow-sm">
-          <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
+      {/* Profile card */}
+      <div className="premium-panel overflow-hidden">
+        {/* Cover gradient */}
+        <div className="h-24 w-full gradient-brand opacity-60" />
 
-          <CardContent className="relative p-6 sm:p-8">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-              {/* Avatar */}
-              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-primary/10 text-2xl font-bold text-primary ring-8 ring-primary/5">
-                {getInitials(user?.name)}
-              </div>
-
-              <div className="min-w-0">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Organizer
-                </div>
-
-                <h2 className="mt-3 truncate text-2xl font-bold tracking-tight">
-                  {user?.name || "User"}
-                </h2>
-
-                <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                  {user?.email || "Email unavailable"}
-                </p>
-              </div>
+        {/* Avatar + name */}
+        <div className="relative px-7 pb-7 pt-0">
+          <div className="-mt-10 mb-5 flex items-end gap-4">
+            <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-4 border-background bg-primary/20 text-3xl font-black text-primary shadow-glass">
+              {initials}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Account Information */}
-        <Card className="overflow-hidden border-border shadow-sm">
-          <div className="border-b border-border px-6 py-5 sm:px-8">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <UserRound className="h-5 w-5" />
-              </div>
-
-              <div>
-                <h2 className="font-semibold">
-                  Account information
-                </h2>
-
-                <p className="text-xs text-muted-foreground">
-                  Your basic organizer account details.
-                </p>
-              </div>
+            <div className="mb-1">
+              <p className="text-lg font-bold">{user.name}</p>
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                <CheckCircle2 className="h-3 w-3" />
+                {user.role}
+              </span>
             </div>
           </div>
 
-          <CardContent className="p-0">
-            <div className="grid sm:grid-cols-2">
-              {/* Name */}
-              <div className="border-b border-border p-6 sm:border-r">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Full name
-                </p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <UserRound className="h-4 w-4 text-muted-foreground" />
-                  </div>
-
-                  <p className="font-semibold">
-                    {user?.name || "—"}
-                  </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Name */}
+            <div className="glass p-5">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <User className="h-4 w-4" />
                 </div>
-              </div>
-
-              {/* Email */}
-              <div className="border-b border-border p-6">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Email address
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Full Name
                 </p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                  </div>
-
-                  <p className="break-all font-semibold">
-                    {user?.email || "—"}
-                  </p>
-                </div>
               </div>
-
-              {/* Role */}
-              <div className="p-6 sm:border-r">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Account role
-                </p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
-                    <ShieldCheck className="h-4 w-4" />
-                  </div>
-
-                  <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-600">
-                    {user?.role || "—"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Account Type */}
-              <div className="p-6">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Account type
-                </p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
-                    <CalendarDays className="h-4 w-4" />
-                  </div>
-
-                  <p className="font-semibold">
-                    Event Organizer
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Organizer Note */}
-        <div className="rounded-2xl border border-primary/15 bg-primary/5 p-5 sm:p-6">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <CalendarDays className="h-4 w-4" />
+              <p className="font-semibold">{user.name}</p>
             </div>
 
-            <div>
-              <h3 className="text-sm font-semibold">
-                Your organizer account
-              </h3>
+            {/* Email */}
+            <div className="glass p-5">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                  <Mail className="h-4 w-4" />
+                </div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Email Address
+                </p>
+              </div>
+              <p className="truncate font-semibold">{user.email}</p>
+            </div>
 
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                Use your organizer dashboard to create events, manage your
-                existing events, and track attendee bookings.
+            {/* Role */}
+            <div className="glass p-5">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+                  <Shield className="h-4 w-4" />
+                </div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Account Role
+                </p>
+              </div>
+              <p className="font-semibold">
+                {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
               </p>
             </div>
+
+            {/* Member since */}
+            <div className="glass p-5">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+                  <CalendarDays className="h-4 w-4" />
+                </div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Member Since
+                </p>
+              </div>
+              <p className="font-semibold">{joinDate}</p>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Quick actions */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="glass p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Edit3 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold">Edit Profile</p>
+              <p className="text-xs text-muted-foreground">Update your name or details</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" className="w-full rounded-xl" disabled>
+            Coming Soon
+          </Button>
+        </div>
+
+        <div className="glass p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+              <KeyRound className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold">Change Password</p>
+              <p className="text-xs text-muted-foreground">Update your account password</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" className="w-full rounded-xl" disabled>
+            Coming Soon
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick nav */}
+      <div className="mt-5 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Quick Links
+        </p>
+        <div className="space-y-1">
+          {[
+            { label: "My Events", href: "/organizer/events" },
+            { label: "Create New Event", href: "/organizer/events/create" },
+            { label: "View Bookings", href: "/organizer/bookings" },
+            { label: "Contact Support", href: "/contact" },
+          ].map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
+            >
+              {label}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          ))}
         </div>
       </div>
     </div>

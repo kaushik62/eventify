@@ -60,7 +60,7 @@ export default function EventDetailsPage() {
 
   if (!event) {
     return (
-      <main className="min-h-screen bg-muted/20">
+      <main className="page-surface min-h-screen">
         <div className="mx-auto max-w-[88rem] px-4 py-24 text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           <p className="mt-4 text-sm text-muted-foreground">
@@ -142,7 +142,7 @@ export default function EventDetailsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
+    <main className="page-surface min-h-screen">
       <div className="mx-auto max-w-[88rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
 
         {/* Back button */}
@@ -160,7 +160,7 @@ export default function EventDetailsPage() {
           <div className="min-w-0 lg:col-span-2">
 
             {/* Hero image */}
-            <div className="group relative h-[280px] overflow-hidden rounded-3xl bg-muted shadow-xl sm:h-[400px] lg:h-[500px]">
+            <div className="group relative h-[280px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-surface shadow-glass-lg sm:h-[400px] lg:h-[500px]">
               {imageUrl ? (
                 <>
                   <Image
@@ -175,7 +175,7 @@ export default function EventDetailsPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
                   <div className="absolute bottom-5 left-5 right-5 sm:bottom-7 sm:left-7">
-                    <Badge className="border-0 bg-white/95 text-black shadow-sm backdrop-blur">
+                    <Badge className="border border-white/20 bg-background/70 text-foreground backdrop-blur-md">
                       {event.category}
                     </Badge>
                   </div>
@@ -243,7 +243,7 @@ export default function EventDetailsPage() {
             </div>
 
             {/* Description */}
-            <section className="mt-10 rounded-2xl border bg-background p-6 shadow-sm sm:p-7">
+            <section className="glass mt-10 p-7 sm:p-8">
               <h2 className="text-xl font-bold">About this event</h2>
 
               <div className="mt-4 whitespace-pre-line text-sm leading-7 text-muted-foreground sm:text-base">
@@ -277,10 +277,10 @@ export default function EventDetailsPage() {
 
           {/* Booking panel */}
           <aside className="lg:relative">
-            <div className="sticky top-24 overflow-hidden rounded-3xl border bg-background shadow-xl">
+            <div className="glass-strong sticky top-24 overflow-hidden">
 
               {/* Price header */}
-              <div className="border-b bg-muted/20 p-6 sm:p-7">
+              <div className="border-b border-white/10 bg-white/[0.03] p-7 sm:p-8">
                 <p className="text-sm font-medium text-muted-foreground">
                   Starting from
                 </p>
@@ -312,7 +312,7 @@ export default function EventDetailsPage() {
               </div>
 
               {/* Booking controls */}
-              <div className="p-6 sm:p-7">
+              <div className="p-7 sm:p-8">
 
                 <div>
                   <p className="text-sm font-semibold">Select tickets</p>
@@ -322,7 +322,7 @@ export default function EventDetailsPage() {
                 </div>
 
                 {/* Quantity */}
-                <div className="mt-5 flex items-center justify-between rounded-2xl border bg-muted/20 p-3">
+                <div className="mt-5 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] p-3">
                   <span className="pl-2 text-sm font-medium">
                     Tickets
                   </span>
@@ -333,7 +333,7 @@ export default function EventDetailsPage() {
                         setQuantity((q) => Math.max(1, q - 1))
                       }
                       disabled={quantity <= 1}
-                      className="grid h-9 w-9 place-items-center rounded-full border bg-background transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                      className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.05] transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
                       aria-label="Decrease tickets"
                     >
                       <Minus className="h-4 w-4" />
@@ -352,7 +352,7 @@ export default function EventDetailsPage() {
                       disabled={
                         quantity >= event.available_seats
                       }
-                      className="grid h-9 w-9 place-items-center rounded-full border bg-background transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                      className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.05] transition hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
                       aria-label="Increase tickets"
                     >
                       <Plus className="h-4 w-4" />
@@ -403,14 +403,14 @@ export default function EventDetailsPage() {
                 </Button>
 
                 {isOrganizerEvent && (
-                  <p className="mt-3 text-center text-xs text-amber-600">
+                  <p className="mt-3 text-center text-xs text-amber-400">
                     Organizers cannot book tickets for events they created.
                   </p>
                 )}
 
                 {/* Trust message */}
-                <div className="mt-5 flex items-start gap-3 rounded-xl bg-muted/50 p-3">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                <div className="mt-5 flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
 
                   <p className="text-[11px] leading-5 text-muted-foreground">
                     Secure checkout powered by Razorpay. Your payment
@@ -436,7 +436,7 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border bg-background p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+    <div className="glass card-hover flex items-center gap-4 p-5">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
         {icon}
       </div>

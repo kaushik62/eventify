@@ -54,31 +54,43 @@ export function AIAssistant() {
           role="dialog"
           aria-label="AI event assistant"
           aria-modal="false"
-          className="mb-3 flex h-[min(32rem,calc(100vh-7rem))] w-[calc(100vw-2rem)] max-w-80 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+          className="mb-3 flex h-[min(32rem,calc(100vh-7rem))] w-[calc(100vw-2rem)] max-w-80 flex-col overflow-hidden rounded-2xl border border-white/12 bg-background/90 shadow-glass-lg backdrop-blur-2xl"
         >
-          <div className="flex items-center justify-between gradient-brand p-3 text-white">
+          <div className="flex items-center justify-between border-b border-white/10 gradient-brand p-4 text-white">
             <span className="flex items-center gap-2 text-sm font-semibold">
-              <Sparkles className="h-4 w-4" /> AI Assistant
+              <Sparkles className="h-4 w-4 text-primary" /> AI Assistant
             </span>
-            <button onClick={() => setOpen(false)} aria-label="Close AI Assistant" className="rounded-md p-1 transition hover:bg-white/10">
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close AI Assistant"
+              className="rounded-lg p-1.5 transition hover:bg-white/10"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-3">
+
+          <div className="flex-1 space-y-3 overflow-y-auto p-4">
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                  m.role === "user" ? "ml-auto bg-primary text-primary-foreground" : "bg-muted"
+                className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-sm ${
+                  m.role === "user"
+                    ? "ml-auto border border-primary/20 bg-primary/90 text-primary-foreground"
+                    : "border border-white/10 bg-white/[0.06] text-foreground"
                 }`}
               >
                 {m.content}
               </div>
             ))}
-            {loading && <div className="w-fit rounded-lg bg-muted px-3 py-2 text-sm">Thinking…</div>}
+            {loading && (
+              <div className="w-fit rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm text-muted-foreground">
+                Thinking…
+              </div>
+            )}
             <div ref={endRef} />
           </div>
-          <div className="flex gap-2 border-t border-border p-3">
+
+          <div className="flex gap-2 border-t border-white/10 p-3">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -92,9 +104,10 @@ export function AIAssistant() {
           </div>
         </div>
       )}
+
       <button
         onClick={() => setOpen(!open)}
-        className="grid h-14 w-14 place-items-center rounded-full gradient-brand text-white shadow-lg transition-transform hover:scale-105"
+        className="grid h-14 w-14 place-items-center rounded-full border border-white/15 gradient-brand text-white shadow-glow transition-transform hover:scale-105"
         aria-label="Open AI Assistant"
       >
         <Sparkles className="h-6 w-6" />

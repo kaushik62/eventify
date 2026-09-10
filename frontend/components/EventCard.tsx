@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, MapPin, Heart, Sparkles, Users } from "lucide-react";
+import { CalendarDays, MapPin, Sparkles, Users, Clock, Tag } from "lucide-react";
 import { EventItem } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { getEventImageUrl } from "@/lib/image";
@@ -9,85 +9,115 @@ export function EventCard({ event }: { event: EventItem }) {
   const date = new Date(event.event_date).toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
+    year: "numeric",
   });
 
   const seatsLeft = Number(event.available_seats ?? 0);
   const isAlmostFull = seatsLeft > 0 && seatsLeft <= 10;
+  const isSoldOut = seatsLeft === 0;
+
+  // Format time nicely
+  const formatTime = (time: string) => {
+    if (!time) return "";
+    const [h, m] = time.split(":");
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${m} ${ampm}`;
+  };
 
   return (
-    <article className="card-hover group block h-full overflow-hidden rounded-[1.6rem] border border-border/75 bg-gradient-to-br from-card via-card to-orange-50/60 shadow-[0_18px_42px_-28px_rgba(24,44,53,0.52)]">
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+    <article className="card-hover group block h-full overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.075] via-white/[0.04] to-primary/[0.03] shadow-glass backdrop-blur-xl">
+
+      {/* Image section */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface">
         {getEventImageUrl(event.image_url) ? (
           <Image
             src={getEventImageUrl(event.image_url) || ""}
             alt={event.name}
             fill
             unoptimized
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 gradient-brand px-6 text-center text-white">
-            <CalendarDays className="h-8 w-8 opacity-80" />
-            <span className="text-sm font-semibold">{event.category} experience</span>
+            <CalendarDays className="h-10 w-10 opacity-70" />
+            <span className="text-sm font-semibold opacity-90">{event.category} experience</span>
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        <Badge className="absolute left-4 top-4 border border-white/60 bg-white/90 text-foreground shadow-sm backdrop-blur-md">
+        {/* Category badge */}
+        <Badge className="absolute left-5 top-5 border border-white/20 bg-background/60 text-foreground backdrop-blur-md">
+          <Tag className="mr-1 h-3 w-3" />
           {event.category}
         </Badge>
 
-        {isAlmostFull && (
-          <Badge className="absolute right-14 top-4 border-0 bg-amber-400/95 text-amber-950 shadow-sm">
-            Limited
+        {/* Status badges */}
+        {isSoldOut ? (
+          <Badge className="absolute right-5 top-5 border-0 bg-red-500/90 text-white">
+            Sold Out
           </Badge>
-        )}
+        ) : isAlmostFull ? (
+          <Badge className="absolute right-5 top-5 border-0 bg-amber-400/90 text-amber-950">
+            {seatsLeft} left
+          </Badge>
+        ) : null}
 
-        <button
-          onClick={(e) => e.preventDefault()}
-          className="absolute right-4 top-4 z-20 grid h-9 w-9 place-items-center rounded-full border border-white/60 bg-white/90 text-foreground shadow-sm backdrop-blur-md transition hover:scale-105 hover:text-primary"
-          aria-label="Favorite"
-        >
-          <Heart className="h-4 w-4" />
-        </button>
-
+        {/* Invisible link overlay */}
         <Link href={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View ${event.name}`} />
 
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4 text-white">
+        {/* Bottom info overlay */}
+        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 text-white">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/70">{date}</p>
-            <p className="mt-1 text-xs text-white/80">{seatsLeft} seats left</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">{date}</p>
+            {event.event_time && (
+              <p className="mt-0.5 text-xs text-white/55">{formatTime(event.event_time)}</p>
+            )}
           </div>
-          <div className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[10px] font-medium backdrop-blur-sm">
-            <Sparkles className="h-3 w-3 text-amber-300" />
+          <div className="flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm">
+            <Sparkles className="h-3 w-3 text-primary" />
             Top pick
           </div>
         </div>
       </div>
 
-      <Link href={`/events/${event.id}`} className="block space-y-5 p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">{date}</p>
-            <h3 className="mt-1 line-clamp-2 text-xl font-bold leading-tight tracking-[-0.025em] text-foreground">{event.name}</h3>
-          </div>
+      {/* Content section */}
+      <Link href={`/events/${event.id}`} className="block space-y-4 p-6 sm:p-7">
+        <div>
+          <h3 className="line-clamp-2 text-lg font-bold leading-tight tracking-[-0.02em] text-foreground transition-colors group-hover:text-primary sm:text-[1.2rem]">
+            {event.name}
+          </h3>
+          {event.description && (
+            <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-muted-foreground">
+              {event.description}
+            </p>
+          )}
         </div>
 
-        <p className="flex min-h-5 items-center gap-1.5 truncate text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
-          {event.location}
-        </p>
+        <div className="space-y-2">
+          <p className="flex items-center gap-2 truncate text-sm text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-accent" />
+            {event.location}
+          </p>
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-3.5 w-3.5 shrink-0 text-accent" />
+            {date}{event.event_time ? ` · ${formatTime(event.event_time)}` : ""}
+          </p>
+        </div>
 
-        <div className="flex items-center justify-between border-t border-border/70 pt-4">
+        {/* Price + CTA */}
+        <div className="flex items-center justify-between border-t border-white/10 pt-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">From</p>
-            <span className="text-base font-bold text-foreground">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">From</p>
+            <span className="text-xl font-bold tracking-tight text-foreground">
               ₹{Number(event.price).toLocaleString("en-IN")}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1.5 text-[11px] font-semibold text-primary">
+          <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground">
             <Users className="h-3.5 w-3.5" />
             Book now
           </div>
