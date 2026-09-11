@@ -23,6 +23,8 @@ services:
     image: kaushik62/eventify:backend
     ports:
       - "5000:5000"
+    volumes:
+      - ./backend/src:/app/src
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 5000

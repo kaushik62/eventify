@@ -23,13 +23,67 @@ const getEventContext = async () => {
 const generateFallbackResponse = (message, events) => {
   const queryLower = message.toLowerCase();
 
-  // Search in events list
+  // 1. How to book / booking instructions
+  if (
+    queryLower.includes("book") ||
+    queryLower.includes("ticket") ||
+    queryLower.includes("reserve")
+  ) {
+    if (queryLower.includes("how") || queryLower.includes("process") || queryLower.includes("step")) {
+      return "To book an event on Eventify:\n1. Browse our Events page and choose an event.\n2. Select your desired number of tickets.\n3. Click 'Book Now' and complete secure payment via Razorpay.\n4. View your confirmed tickets and booking IDs anytime in your Dashboard!";
+    }
+  }
+
+  // 2. Hosting and organizer queries
+  if (
+    queryLower.includes("organizer") ||
+    queryLower.includes("host") ||
+    queryLower.includes("create event") ||
+    queryLower.includes("publish event")
+  ) {
+    return "To host an event on Eventify:\n1. Register or login with an 'Organizer' account.\n2. Go to your Organizer Dashboard from the top navigation.\n3. Click 'Create Event', fill in your event details, location, schedule, and ticket prices.\n4. Publish and start selling tickets immediately!";
+  }
+
+  // 3. Payment and payment methods
+  if (
+    queryLower.includes("payment") ||
+    queryLower.includes("pay") ||
+    queryLower.includes("razorpay") ||
+    queryLower.includes("upi") ||
+    queryLower.includes("card")
+  ) {
+    return "Eventify supports fast and secure online payments via Razorpay. You can pay using UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and popular Wallets.";
+  }
+
+  // 4. Refunds and support
+  if (queryLower.includes("refund") || queryLower.includes("cancel") || queryLower.includes("support")) {
+    return "Need assistance or have questions about a booking? Reach out through our Contact page or check the FAQ section for ticket policies and support options.";
+  }
+
+  // 5. Pricing queries
+  if (queryLower.includes("price") || queryLower.includes("cost") || queryLower.includes("fee")) {
+    if (events.length > 0) {
+      const sample = events
+        .slice(0, 3)
+        .map((e) => `• **${e.name}**: ₹${Number(e.price).toLocaleString("en-IN")}`)
+        .join("\n");
+      return `Here are ticket prices for some upcoming events:\n\n${sample}\n\nCheck out the Events page for all pricing details!`;
+    }
+  }
+
+  // 6. Search for matching events in category, name, location, or description
+  const words = queryLower.split(/\s+/).filter((w) => w.length > 2);
   const matches = events.filter((e) => {
     return (
       e.name.toLowerCase().includes(queryLower) ||
       e.category.toLowerCase().includes(queryLower) ||
       e.location.toLowerCase().includes(queryLower) ||
-      e.description.toLowerCase().includes(queryLower)
+      words.some(
+        (w) =>
+          e.category.toLowerCase().includes(w) ||
+          e.location.toLowerCase().includes(w) ||
+          e.name.toLowerCase().includes(w)
+      )
     );
   });
 
@@ -41,33 +95,16 @@ const generateFallbackResponse = (message, events) => {
           `• **${e.name}** (${e.category}) in ${e.location} on ${new Date(e.event_date).toLocaleDateString("en-IN")} at ${e.event_time.slice(0, 5)} — ₹${Number(e.price).toLocaleString("en-IN")} (${e.available_seats} seats left)`
       )
       .join("\n");
-    return `Here are some matching events I found:\n\n${list}\n\nYou can view full details and book tickets on our Events page!`;
+    return `Here are some matching events I found for you:\n\n${list}\n\nYou can view full details and book tickets on our Events page!`;
   }
 
-  if (queryLower.includes("how to book") || queryLower.includes("booking")) {
-    return "To book an event on Eventify:\n1. Browse our Events page and choose an event.\n2. Select your desired number of tickets.\n3. Click 'Book Now' and complete secure payment via Razorpay.\n4. View your confirmed tickets anytime in your Dashboard!";
-  }
-
-  if (queryLower.includes("organizer") || queryLower.includes("host") || queryLower.includes("create event")) {
-    return "To host an event on Eventify, register with an 'Organizer' account. Once logged in, visit the Organizer Dashboard to create, publish, and manage your events and track bookings!";
-  }
-
-  if (queryLower.includes("price") || queryLower.includes("cost") || queryLower.includes("free")) {
-    if (events.length > 0) {
-      const sample = events
-        .slice(0, 3)
-        .map((e) => `• **${e.name}**: ₹${Number(e.price).toLocaleString("en-IN")}`)
-        .join("\n");
-      return `Here are ticket prices for some upcoming events:\n\n${sample}\n\nCheck out the Events page for all pricing details.`;
-    }
-  }
-
+  // 7. General suggestions if no direct match
   if (events.length > 0) {
     const featured = events
       .slice(0, 3)
       .map((e) => `• **${e.name}** (${e.category}) in ${e.location} — ₹${Number(e.price).toLocaleString("en-IN")}`)
       .join("\n");
-    return `I'm here to help! Here are a few popular upcoming events:\n\n${featured}\n\nFeel free to ask about specific categories (Music, Tech, Sports, etc.), locations, or how to book!`;
+    return `I'm here to help you discover and book events! Here are a few popular upcoming events:\n\n${featured}\n\nFeel free to ask about specific categories (Music, Tech, Sports, etc.), cities, or ticket prices!`;
   }
 
   return "Welcome to Eventify! You can discover exciting upcoming events, book tickets, or create and manage your own events as an organizer. What would you like to explore today?";
@@ -99,7 +136,7 @@ Instructions:
 - Keep responses friendly, modern, and engaging with clean markdown formatting.`;
 
     const completion = await groq.chat.completions.create({
-      model: process.env.GROQ_MODEL || "llama-3.1-8b-instant",
+      model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
       messages: [
         { role: "system", content: systemPrompt },
         ...history.slice(-6).map((h) => ({ role: h.role, content: h.content })),

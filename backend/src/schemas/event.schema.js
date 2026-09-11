@@ -10,7 +10,10 @@ export const createEventSchema = z.object({
     const parsed = Date.parse(d);
     return !isNaN(parsed) && parsed >= Date.now();
   }, "Event date must be today or in the future"),
-  eventTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be HH:MM format"),
+  eventTime: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/, "Time must be HH:MM format")
+    .transform((t) => t.slice(0, 5)),
   price: z.number().nonnegative("Price must be 0 or greater"),
   totalSeats: z.number().int().positive("Seats must be at least 1"),
   imageUrl: z.string().url().optional(),

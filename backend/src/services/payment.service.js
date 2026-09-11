@@ -41,7 +41,14 @@ export const createRazorpayOrder = async (bookingId, userId) => {
     [bookingId, order.id, booking.total_amount]
   );
 
-  return { order, booking };
+  return {
+    order,
+    orderId: order.id,
+    amount: order.amount,
+    currency: order.currency,
+    keyId: process.env.RAZORPAY_KEY_ID,
+    booking,
+  };
 };
 
 // Verify Razorpay webhook/client payment signature

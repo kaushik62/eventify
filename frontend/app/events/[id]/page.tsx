@@ -38,11 +38,13 @@ export default function EventDetailsPage() {
   const [related, setRelated] = useState<EventItem[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [processing, setProcessing] = useState(false);
+  const [bookingError, setBookingError] = useState("");
 
   useEffect(() => {
     api.get(`/events/${id}`).then((res) => {
-      setEvent(res.data.data.event);
-      setRelated(res.data.data.related);
+      const data = res.data.data;
+      setEvent(data?.event || data);
+      setRelated(data?.related || []);
     });
   }, [id]);
 
@@ -83,10 +85,11 @@ export default function EventDetailsPage() {
     }
 
     if (isOrganizerEvent) {
-      alert("Organizers cannot book their own events.");
+      setBookingError("Organizers cannot book their own events.");
       return;
     }
 
+    setBookingError("");
     setProcessing(true);
 
     try {
@@ -112,14 +115,20 @@ export default function EventDetailsPage() {
         order_id: orderId,
 
         handler: async (response: any) => {
-          await api.post("/payments/verify", {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            bookingId: booking.id,
-          });
+          try {
+            await api.post("/payments/verify", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              bookingId: booking.id,
+            });
 
-          router.push(`/booking/confirmation/${booking.id}`);
+            router.push(`/booking/confirmation/${booking.id}`);
+          } catch (verifyErr: any) {
+            setBookingError(
+              verifyErr?.response?.data?.message || "Payment verification failed. Please contact support."
+            );
+          }
         },
 
         theme: {
@@ -135,7 +144,7 @@ export default function EventDetailsPage() {
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         "Something went wrong while creating your booking.";
-      alert(message);
+      setBookingError(message);
     } finally {
       setProcessing(false);
     }
@@ -385,6 +394,12 @@ export default function EventDetailsPage() {
                     </div>
                   </div>
                 </div>
+
+                {bookingError && (
+                  <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-center text-xs font-medium text-red-300">
+                    {bookingError}
+                  </p>
+                )}
 
                 {/* CTA */}
                 <Button

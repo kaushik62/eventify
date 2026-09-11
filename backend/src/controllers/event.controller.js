@@ -17,7 +17,7 @@ export const getEvent = asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const event = await eventService.getEventById(id);
   const related = await eventService.getRelatedEvents(event.category, id);
-  return success(res, { ...event, related });
+  return success(res, { ...event, event, related });
 });
 
 export const createEvent = asyncHandler(async (req, res) => {
