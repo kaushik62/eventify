@@ -33,38 +33,38 @@ export const listEvents = async (filters) => {
 
   if (filters.search) {
     values.push(`%${filters.search}%`);
-    conditions.push(`(name ILIKE $${values.length} OR description ILIKE $${values.length})`);
+    conditions.push(`(e.name ILIKE $${values.length} OR e.description ILIKE $${values.length})`);
   }
   if (filters.category) {
     values.push(filters.category);
-    conditions.push(`category = $${values.length}`);
+    conditions.push(`e.category = $${values.length}`);
   }
   if (filters.location) {
     values.push(`%${filters.location}%`);
-    conditions.push(`location ILIKE $${values.length}`);
+    conditions.push(`e.location ILIKE $${values.length}`);
   }
   if (filters.date) {
     values.push(filters.date);
-    conditions.push(`event_date = $${values.length}`);
+    conditions.push(`e.event_date = $${values.length}`);
   }
   if (filters.minPrice !== undefined) {
     values.push(filters.minPrice);
-    conditions.push(`price >= $${values.length}`);
+    conditions.push(`e.price >= $${values.length}`);
   }
   if (filters.maxPrice !== undefined) {
     values.push(filters.maxPrice);
-    conditions.push(`price <= $${values.length}`);
+    conditions.push(`e.price <= $${values.length}`);
   }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const sortMap = {
-    date_asc: "event_date ASC",
-    date_desc: "event_date DESC",
-    price_asc: "price ASC",
-    price_desc: "price DESC",
+    date_asc: "e.event_date ASC",
+    date_desc: "e.event_date DESC",
+    price_asc: "e.price ASC",
+    price_desc: "e.price DESC",
   };
-  const orderBy = sortMap[filters.sort ?? ""] ?? "event_date ASC";
+  const orderBy = sortMap[filters.sort ?? ""] ?? "e.event_date ASC";
 
   const offset = (filters.page - 1) * filters.limit;
   const limitIdx = values.length + 1;

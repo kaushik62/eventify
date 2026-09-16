@@ -49,8 +49,13 @@ export function AIAssistant() {
         history: nextMessages.slice(-6),
       });
 
-      const reply = res.data?.data?.reply || res.data?.reply || "I'm here to help! Feel free to ask about any events.";
+      const reply =
+        res.data?.data?.reply ||
+        res.data?.response ||
+        res.data?.reply ||
+        "I'm here to help! Feel free to ask about any events.";
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+
     } catch {
       setMessages((prev) => [
         ...prev,

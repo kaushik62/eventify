@@ -28,3 +28,18 @@ export const authorizeRole = (...roles) => {
     next();
   };
 };
+
+// Optionally authenticate user if token is present, without failing if absent
+export const extractOptionalUser = (req, _res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = req.cookies?.token || (authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
+
+  if (token) {
+    const payload = verifyToken(token);
+    if (payload) {
+      req.user = payload;
+    }
+  }
+  next();
+};
+
