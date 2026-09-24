@@ -5,12 +5,10 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    // 1. Verify PostgreSQL connection before starting the server
     console.log("Testing PostgreSQL database connection...");
     await testDbConnection();
     console.log("✓ PostgreSQL database connected successfully");
 
-    // 2. Start Express API server
     app.listen(PORT, () => {
       console.log(`✓ Eventify API running on http://localhost:${PORT}`);
     });
@@ -22,3 +20,4 @@ const startServer = async () => {
 };
 
 startServer();
+

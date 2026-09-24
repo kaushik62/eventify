@@ -25,3 +25,4 @@ export const eventBookings = asyncHandler(async (req, res) => {
   const bookings = await bookingService.getBookingsForOrganizerEvent(eventId, req.user.id);
   return success(res, bookings);
 });
+

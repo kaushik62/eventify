@@ -1,7 +1,6 @@
 import { query } from "../db/db.js";
 import { ApiError } from "../utils/apiResponse.js";
 
-// Helper to map camelCase field names to database snake_case columns
 const columnToDbName = (column) => {
   const map = {
     name: "name",
@@ -17,7 +16,6 @@ const columnToDbName = (column) => {
   return map[column] ?? column;
 };
 
-// Check if an event belongs to an organizer
 const assertOwnership = async (eventId, organizerId) => {
   const result = await query("SELECT organizer_id FROM events WHERE id = $1", [eventId]);
   if (result.rows.length === 0) throw new ApiError(404, "Event not found");
@@ -26,7 +24,6 @@ const assertOwnership = async (eventId, organizerId) => {
   }
 };
 
-// List public events with search, category, location, date, price, and sorting filters
 export const listEvents = async (filters) => {
   const conditions = [];
   const values = [];
@@ -90,7 +87,6 @@ export const listEvents = async (filters) => {
   };
 };
 
-// Get single event by ID
 export const getEventById = async (id) => {
   const result = await query(
     `SELECT e.*, u.name AS organizer_name
@@ -105,7 +101,6 @@ export const getEventById = async (id) => {
   return result.rows[0];
 };
 
-// Create a new event
 export const createEvent = async (organizerId, input) => {
   const fallbackImage = "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=1200";
 
@@ -131,7 +126,6 @@ export const createEvent = async (organizerId, input) => {
   return result.rows[0];
 };
 
-// Update an existing event
 export const updateEvent = async (eventId, organizerId, input) => {
   await assertOwnership(eventId, organizerId);
 
@@ -178,7 +172,6 @@ export const updateEvent = async (eventId, organizerId, input) => {
   return result.rows[0];
 };
 
-// Delete an event
 export const deleteEvent = async (eventId, organizerId, isAdmin = false) => {
   if (!isAdmin) {
     await assertOwnership(eventId, organizerId);
@@ -186,7 +179,6 @@ export const deleteEvent = async (eventId, organizerId, isAdmin = false) => {
   await query("DELETE FROM events WHERE id = $1", [eventId]);
 };
 
-// List events created by a specific organizer
 export const listEventsByOrganizer = async (organizerId) => {
   const result = await query(
     "SELECT * FROM events WHERE organizer_id = $1 ORDER BY event_date ASC",
@@ -195,7 +187,6 @@ export const listEventsByOrganizer = async (organizerId) => {
   return result.rows;
 };
 
-// Get stats for organizer dashboard
 export const getOrganizerStats = async (organizerId) => {
   const result = await query(
     `SELECT
@@ -211,7 +202,6 @@ export const getOrganizerStats = async (organizerId) => {
   return result.rows[0];
 };
 
-// Get related events by category
 export const getRelatedEvents = async (category, excludeId) => {
   const result = await query(
     `SELECT * FROM events WHERE category = $1 AND id != $2 ORDER BY event_date ASC LIMIT 4`,
@@ -219,3 +209,4 @@ export const getRelatedEvents = async (category, excludeId) => {
   );
   return result.rows;
 };
+

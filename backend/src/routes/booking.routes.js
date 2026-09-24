@@ -4,9 +4,9 @@ import { authenticateUser } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-// All booking routes require user to be logged in
 router.post("/", authenticateUser, bookingController.createBooking);
 router.get("/", authenticateUser, bookingController.listMyBookings);
 router.get("/:id", authenticateUser, bookingController.getBooking);
 
 export default router;
+

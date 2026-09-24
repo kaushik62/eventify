@@ -9,10 +9,9 @@ const presignedUrlSchema = z.object({
   fileType: z.string().min(1, "File type is required"),
 });
 
-// Configure multer for memory storage and image filtering
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
       cb(null, true);
@@ -62,3 +61,4 @@ export const getImage = asyncHandler(async (req, res) => {
     res.status(404).json({ success: false, message: "Image not found" });
   }
 });
+

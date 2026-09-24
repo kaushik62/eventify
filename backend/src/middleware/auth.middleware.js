@@ -1,7 +1,6 @@
 import { verifyToken } from "../utils/jwt.js";
 import { failure } from "../utils/apiResponse.js";
 
-// Authenticate user from cookie or Authorization header
 export const authenticateUser = (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = req.cookies?.token || (authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
@@ -19,7 +18,6 @@ export const authenticateUser = (req, res, next) => {
   next();
 };
 
-// Authorize specific user roles (e.g. 'ADMIN', 'ORGANIZER')
 export const authorizeRole = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -29,7 +27,6 @@ export const authorizeRole = (...roles) => {
   };
 };
 
-// Optionally authenticate user if token is present, without failing if absent
 export const extractOptionalUser = (req, _res, next) => {
   const authHeader = req.headers.authorization;
   const token = req.cookies?.token || (authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
@@ -42,4 +39,5 @@ export const extractOptionalUser = (req, _res, next) => {
   }
   next();
 };
+
 

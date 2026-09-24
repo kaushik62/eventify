@@ -11,7 +11,6 @@ const razorpay = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
     })
   : null;
 
-// Create Razorpay order for a pending booking
 export const createRazorpayOrder = async (bookingId, userId) => {
   if (!razorpay) {
     throw new ApiError(503, "Payment service is not configured. Add Razorpay keys to continue.");
@@ -30,7 +29,7 @@ export const createRazorpayOrder = async (bookingId, userId) => {
   }
 
   const order = await razorpay.orders.create({
-    amount: Math.round(Number(booking.total_amount) * 100), // convert to paise
+    amount: Math.round(Number(booking.total_amount) * 100),
     currency: "INR",
     receipt: `booking_${booking.id}`,
   });
@@ -51,7 +50,6 @@ export const createRazorpayOrder = async (bookingId, userId) => {
   };
 };
 
-// Verify Razorpay webhook/client payment signature
 export const verifyRazorpayPayment = async (input, userId) => {
   if (!process.env.RAZORPAY_KEY_SECRET) {
     throw new ApiError(503, "Payment service is not configured");
@@ -96,3 +94,4 @@ export const verifyRazorpayPayment = async (input, userId) => {
 
   return confirmBooking(payment.booking_id);
 };
+

@@ -5,7 +5,6 @@ import { ApiError } from "../utils/apiResponse.js";
 
 const SALT_ROUNDS = 10;
 
-// Register a new user
 export const registerUser = async (input) => {
   const existing = await query("SELECT id FROM users WHERE email = $1", [input.email]);
   if (existing.rows.length > 0) {
@@ -26,7 +25,6 @@ export const registerUser = async (input) => {
   return { user, token };
 };
 
-// Login an existing user
 export const loginUser = async (input) => {
   const result = await query(
     "SELECT id, name, email, password, role FROM users WHERE email = $1",
@@ -34,12 +32,7 @@ export const loginUser = async (input) => {
   );
   const user = result.rows[0];
 
-  if (!user) {
-    throw new ApiError(401, "Invalid email or password");
-  }
-
-  const passwordMatches = await bcrypt.compare(input.password, user.password);
-  if (!passwordMatches) {
+  if (!user || !(await bcrypt.compare(input.password, user.password))) {
     throw new ApiError(401, "Invalid email or password");
   }
 
@@ -48,7 +41,6 @@ export const loginUser = async (input) => {
   return { user, token };
 };
 
-// Get user by ID
 export const getUserById = async (id) => {
   const result = await query(
     "SELECT id, name, email, role, created_at FROM users WHERE id = $1",
@@ -59,3 +51,4 @@ export const getUserById = async (id) => {
   }
   return result.rows[0];
 };
+

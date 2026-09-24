@@ -27,3 +27,4 @@ export const deleteEvent = asyncHandler(async (req, res) => {
   const data = await adminService.adminDeleteEvent(eventId);
   return success(res, { message: "Event deleted successfully", data });
 });
+

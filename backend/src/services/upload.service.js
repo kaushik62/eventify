@@ -10,13 +10,11 @@ const s3 = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
   ? new S3Client({ region: AWS_REGION })
   : null;
 
-// Sanitize filename to avoid S3 path issues
 const sanitizeFileName = (fileName) => {
   const safeName = fileName.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9._-]/g, "");
   return safeName || `upload-${Date.now()}`;
 };
 
-// Generate presigned upload URL
 export const generatePresignedUploadUrl = async (fileName, fileType) => {
   if (!s3) {
     throw new Error("S3 upload is not configured. Add AWS credentials and region to enable file uploads.");
@@ -36,7 +34,6 @@ export const generatePresignedUploadUrl = async (fileName, fileType) => {
   return { uploadUrl, publicUrl, key };
 };
 
-// Direct buffer upload to S3
 export const uploadImageToS3 = async (file) => {
   if (!s3) {
     throw new Error("S3 upload is not configured. Add AWS credentials and region to enable file uploads.");
@@ -57,7 +54,6 @@ export const uploadImageToS3 = async (file) => {
   return { publicUrl, key };
 };
 
-// Retrieve image stream from S3
 export const getImageFromS3 = async (key) => {
   if (!s3) {
     throw new Error("S3 upload is not configured. Add AWS credentials and region to enable file uploads.");
@@ -65,3 +61,4 @@ export const getImageFromS3 = async (key) => {
 
   return s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: key }));
 };
+

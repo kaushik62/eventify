@@ -5,7 +5,6 @@ import { authenticateUser, authorizeRole } from "../middleware/auth.middleware.j
 
 const router = Router();
 
-// Organizer endpoints (declared before /:id)
 router.get(
   "/organizer/my-events",
   authenticateUser,
@@ -27,11 +26,9 @@ router.get(
   bookingController.eventBookings
 );
 
-// Public event discovery endpoints
 router.get("/", eventController.listEvents);
 router.get("/:id", eventController.getEvent);
 
-// Organizer event management endpoints
 router.post("/", authenticateUser, authorizeRole("ORGANIZER"), eventController.createEvent);
 router.put("/:id", authenticateUser, authorizeRole("ORGANIZER"), eventController.updateEvent);
 router.delete(
@@ -42,3 +39,4 @@ router.delete(
 );
 
 export default router;
+

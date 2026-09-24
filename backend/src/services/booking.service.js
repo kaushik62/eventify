@@ -1,11 +1,6 @@
 import { query, withTransaction } from "../db/db.js";
 import { ApiError } from "../utils/apiResponse.js";
 
-/**
- * Creates a PENDING booking and atomically reserves seats.
- * Uses a database transaction with SELECT ... FOR UPDATE so concurrent bookings
- * on the same event cannot oversell seats.
- */
 export const createBooking = async (userId, input) => {
   return withTransaction(async (client) => {
     const eventResult = await client.query(
@@ -41,7 +36,6 @@ export const createBooking = async (userId, input) => {
       [userId, input.eventId, input.tickets, totalAmount]
     );
 
-    // Decrement available seats provisionally
     await client.query(
       "UPDATE events SET available_seats = available_seats - $1 WHERE id = $2",
       [input.tickets, input.eventId]
@@ -51,7 +45,6 @@ export const createBooking = async (userId, input) => {
   });
 };
 
-// Confirm a booking when payment succeeds
 export const confirmBooking = async (bookingId) => {
   const result = await query(
     `UPDATE bookings SET status = 'CONFIRMED'
@@ -66,7 +59,6 @@ export const confirmBooking = async (bookingId) => {
   return result.rows[0];
 };
 
-// Fail a booking and return held seats
 export const failBooking = async (bookingId) => {
   return withTransaction(async (client) => {
     const bookingResult = await client.query(
@@ -86,7 +78,6 @@ export const failBooking = async (bookingId) => {
   });
 };
 
-// Get all bookings for a user
 export const getBookingsByUser = async (userId) => {
   const result = await query(
     `SELECT b.*, e.name AS event_name, e.event_date, e.event_time, e.location, e.image_url
@@ -99,7 +90,6 @@ export const getBookingsByUser = async (userId) => {
   return result.rows;
 };
 
-// Get a single booking by ID
 export const getBookingById = async (bookingId, userId) => {
   const ownershipClause = userId === undefined ? "" : " AND b.user_id = $2";
   const result = await query(
@@ -114,7 +104,6 @@ export const getBookingById = async (bookingId, userId) => {
   return result.rows[0];
 };
 
-// Get all bookings for an organizer's event
 export const getBookingsForOrganizerEvent = async (eventId, organizerId) => {
   const eventCheck = await query("SELECT organizer_id FROM events WHERE id = $1", [eventId]);
   if (eventCheck.rows.length === 0) throw new ApiError(404, "Event not found");
@@ -132,3 +121,4 @@ export const getBookingsForOrganizerEvent = async (eventId, organizerId) => {
   );
   return result.rows;
 };
+

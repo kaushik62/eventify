@@ -14,3 +14,4 @@ export const verifyPayment = asyncHandler(async (req, res) => {
   const booking = await paymentService.verifyRazorpayPayment(input, req.user.id);
   return success(res, booking);
 });
+

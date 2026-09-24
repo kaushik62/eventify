@@ -1,6 +1,5 @@
 import { query } from "../db/db.js";
 
-// Fetch overall platform statistics for admin dashboard
 export const getPlatformStats = async () => {
   const [users, organizers, events, bookings, revenue] = await Promise.all([
     query("SELECT COUNT(*) FROM users WHERE role = 'USER'"),
@@ -19,7 +18,6 @@ export const getPlatformStats = async () => {
   };
 };
 
-// List all registered users
 export const listAllUsers = async () => {
   const result = await query(
     `SELECT id, name, email, role, created_at,
@@ -30,7 +28,6 @@ export const listAllUsers = async () => {
   return result.rows;
 };
 
-// List all platform events
 export const listAllEvents = async () => {
   const result = await query(
     `SELECT e.*, u.name AS organizer_name,
@@ -42,7 +39,6 @@ export const listAllEvents = async () => {
   return result.rows;
 };
 
-// List all platform bookings
 export const listAllBookings = async () => {
   const result = await query(
     `SELECT b.*, u.name AS user_name, u.email AS user_email, e.name AS event_name, e.location, e.event_date
@@ -54,8 +50,8 @@ export const listAllBookings = async () => {
   return result.rows;
 };
 
-// Delete any event by admin
 export const adminDeleteEvent = async (eventId) => {
   const result = await query("DELETE FROM events WHERE id = $1 RETURNING id", [eventId]);
   return result.rows[0];
 };
+

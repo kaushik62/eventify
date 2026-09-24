@@ -3,24 +3,11 @@ import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
 import * as eventService from "./event.service.js";
 import * as bookingService from "./booking.service.js";
 
-// Initialize Groq client with environment variables
 const groq = process.env.GROQ_API_KEY
   ? new Groq({ apiKey: process.env.GROQ_API_KEY })
   : null;
 const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
-// ============================================================================
-// 1. LANGGRAPH STATE DEFINITION
-// ============================================================================
-/**
- * AgentState Channels:
- * - userId: number | null     -> Authenticated user ID (extracted from verified JWT, never from client body)
- * - message: string           -> User's current input message
- * - history: Array            -> Recent conversation history for context
- * - intent: object            -> Classification decision { action, params }
- * - toolResult: any           -> Output returned by calling existing services (PostgreSQL)
- * - response: string          -> Final natural-language response generated for the user
- */
 export const AgentState = Annotation.Root({
   userId: Annotation({
     reducer: (x, y) => (y !== undefined ? y : x),
@@ -48,32 +35,9 @@ export const AgentState = Annotation.Root({
   }),
 });
 
-// ============================================================================
-// 2. HELPER FUNCTIONS
-// ============================================================================
-
-// Calculate upcoming Saturday and Sunday dates (YYYY-MM-DD)
-const getUpcomingWeekendDates = () => {
-  const today = new Date();
-  const day = today.getDay(); // 0 is Sun, 6 is Sat
-  const daysUntilSaturday = (6 - day + 7) % 7 || 7;
-
-  const saturday = new Date(today);
-  saturday.setDate(today.getDate() + daysUntilSaturday);
-  const sunday = new Date(saturday);
-  sunday.setDate(saturday.getDate() + 1);
-
-  return {
-    saturday: saturday.toISOString().slice(0, 10),
-    sunday: sunday.toISOString().slice(0, 10),
-  };
-};
-
-// Resilient keyword-based intent fallback when Groq API is unavailable
 const fallbackClassifyIntent = (message) => {
   const q = message.toLowerCase();
 
-  // Booking query
   if (
     q.includes("my booking") ||
     q.includes("my ticket") ||
@@ -85,7 +49,6 @@ const fallbackClassifyIntent = (message) => {
     return { action: "getUserBookings", params: {} };
   }
 
-  // Seat availability check
   const idMatch = q.match(/event\s*(?:#|id)?\s*(\d+)/i) || q.match(/\b(\d+)\b/);
   if (
     (q.includes("available") || q.includes("seat") || q.includes("ticket left")) &&
@@ -97,7 +60,6 @@ const fallbackClassifyIntent = (message) => {
     };
   }
 
-  // Event search
   const isSearch =
     q.includes("find") ||
     q.includes("show") ||
@@ -123,8 +85,9 @@ const fallbackClassifyIntent = (message) => {
     if (q.includes("music")) params.category = "Music";
     if (q.includes("weekend")) params.weekend = true;
 
-    const priceMatch = q.match(/(?:under|below|less than|within)\s*(?:₹|rs\.?|rupees)?\s*(\d+)/i) ||
-                       q.match(/(\d+)\s*(?:₹|rs\.?|rupees)?\s*(?:under|or less)/i);
+    const priceMatch =
+      q.match(/(?:under|below|less than|within)\s*(?:₹|rs\.?|rupees)?\s*(\d+)/i) ||
+      q.match(/(\d+)\s*(?:₹|rs\.?|rupees)?\s*(?:under|or less)/i);
     if (priceMatch) {
       params.maxPrice = parseFloat(priceMatch[1]);
     }
@@ -135,41 +98,21 @@ const fallbackClassifyIntent = (message) => {
   return { action: "generalResponse", params: {} };
 };
 
-// ============================================================================
-// 3. LANGGRAPH NODES
-// ============================================================================
-
-/**
- * NODE: Understand Request
- * Analyzes the user query and determines the required action and parameters.
- */
 const understandRequestNode = async (state) => {
   const { message, history } = state;
 
   if (!groq) {
-    const fallbackIntent = fallbackClassifyIntent(message);
-    return { intent: fallbackIntent };
+    return { intent: fallbackClassifyIntent(message) };
   }
 
   const systemPrompt = `You are the Eventify Intent Classifier.
 Classify the user query into EXACTLY ONE of the following actions:
-1. "searchEvents": User wants to discover, find, list, or filter events (e.g. by topic/name, category, city/location, price, weekend, availability).
-   Parameters to extract:
-   - search: string (event name or keyword like "React", "Workshop", null if none)
-   - category: string ("Technology", "Music", "Workshop", "Sports", "Art", null if none)
-   - location: string (city or venue like "Ranchi", "Bangalore", "Delhi", null if none)
-   - maxPrice: number (max price limit like 500, null if none)
-   - minPrice: number (min price limit, null if none)
-   - weekend: boolean (true if user asks for weekend events)
-   - availableOnly: boolean (true if user asks for events with seats available)
-2. "getUserBookings": User asks to see their personal bookings, tickets, or booking status (e.g. "show my bookings", "what events have I booked?").
-3. "checkEventAvailability": User asks if a specific event is available or has seats left (e.g. "is event 1 available?", "check seats for event 5").
-   Parameters to extract:
-   - eventId: number (e.g. 1, 123)
-   - eventName: string (if event name is mentioned instead of ID)
-4. "generalResponse": Greetings, platform questions (how to book, how to become an organizer, refund policy, payments, about Eventify).
+1. "searchEvents": User wants to discover, find, list, or filter events.
+2. "getUserBookings": User asks to see their personal bookings, tickets, or booking status.
+3. "checkEventAvailability": User asks if a specific event is available or has seats left.
+4. "generalResponse": Greetings, platform questions (how to book, refund policy, organizer guide).
 
-Output JSON only in this exact format:
+Output JSON format:
 {
   "action": "searchEvents" | "getUserBookings" | "checkEventAvailability" | "generalResponse",
   "params": { ... }
@@ -188,59 +131,47 @@ Output JSON only in this exact format:
     });
 
     const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
-    const action = parsed.action || "generalResponse";
-    const params = parsed.params || {};
-
-    return { intent: { action, params } };
-  } catch (err) {
-    console.error("Understand request classification fallback:", err.message);
+    return {
+      intent: {
+        action: parsed.action || "generalResponse",
+        params: parsed.params || {},
+      },
+    };
+  } catch {
     return { intent: fallbackClassifyIntent(message) };
   }
 };
 
-/**
- * NODE: Search Events
- * Calls existing Eventify event.service.js: listEvents(filters) safely with parameterized queries.
- */
 const searchEventsNode = async (state) => {
   const { intent, message } = state;
   const params = intent?.params || {};
 
   try {
-    const filters = {
-      page: 1,
-      limit: 10,
-    };
+    const filters = { page: 1, limit: 10 };
 
-    // Guard: LLM may return null for absent params; only set if meaningful value exists
-    if (params.search != null && params.search !== "") filters.search = params.search;
-    if (params.category != null && params.category !== "") filters.category = params.category;
-    if (params.location != null && params.location !== "") filters.location = params.location;
+    if (params.search) filters.search = params.search;
+    if (params.category) filters.category = params.category;
+    if (params.location) filters.location = params.location;
     if (params.maxPrice != null) filters.maxPrice = Number(params.maxPrice);
     if (params.minPrice != null) filters.minPrice = Number(params.minPrice);
 
-    // If query asks for weekend events, handle date range
     const qLower = message.toLowerCase();
     const isWeekend = params.weekend || qLower.includes("weekend");
 
-    let result = await eventService.listEvents(filters);
+    const result = await eventService.listEvents(filters);
     let events = result.events || [];
 
     if (isWeekend) {
-      const now = new Date();
-      // PostgreSQL returns timestamps in UTC; convert to local date for weekday comparison
       events = events.filter((e) => {
-        // Use local date string "YYYY-MM-DD" to avoid UTC offset shifting the day
         const d = new Date(e.event_date);
-        const localDateStr = d.toLocaleDateString("en-CA"); // "YYYY-MM-DD" in local timezone
+        const localDateStr = d.toLocaleDateString("en-CA");
         const localDate = new Date(localDateStr + "T00:00:00");
-        const day = localDate.getDay(); // 0=Sun, 6=Sat
-        const diffDays = Math.round((localDate.getTime() - new Date().setHours(0,0,0,0)) / (1000 * 60 * 60 * 24));
+        const day = localDate.getDay();
+        const diffDays = Math.round((localDate.getTime() - new Date().setHours(0, 0, 0, 0)) / 86400000);
         return (day === 0 || day === 6) && diffDays >= 0 && diffDays <= 7;
       });
     }
 
-    // If user specifically asked for events with available seats
     if (params.availableOnly || qLower.includes("seats available") || qLower.includes("with seats")) {
       events = events.filter((e) => Number(e.available_seats) > 0);
     }
@@ -270,7 +201,6 @@ const searchEventsNode = async (state) => {
       },
     };
   } catch (err) {
-    console.error("searchEventsNode error:", err.message);
     return {
       toolResult: {
         success: false,
@@ -282,15 +212,9 @@ const searchEventsNode = async (state) => {
   }
 };
 
-/**
- * NODE: Get User Bookings
- * Calls existing booking.service.js: getBookingsByUser(userId).
- * Securely enforces that unauthenticated requests cannot access any bookings.
- */
 const getUserBookingsNode = async (state) => {
   const { userId } = state;
 
-  // Authentication check: If not logged in, return unauthenticated state
   if (!userId) {
     return {
       toolResult: {
@@ -328,7 +252,6 @@ const getUserBookingsNode = async (state) => {
       },
     };
   } catch (err) {
-    console.error("getUserBookingsNode error:", err.message);
     return {
       toolResult: {
         success: false,
@@ -341,21 +264,13 @@ const getUserBookingsNode = async (state) => {
   }
 };
 
-/**
- * NODE: Check Event Availability
- * Safely inspects seat availability for a given event ID.
- * Handles invalid or non-existent IDs gracefully without throwing.
- */
 const checkEventAvailabilityNode = async (state) => {
   const { intent, message } = state;
   let eventId = intent?.params?.eventId;
 
-  // Fallback: extract ID from message regex if not in params
   if (!eventId) {
     const idMatch = message.match(/\b(\d+)\b/);
-    if (idMatch) {
-      eventId = parseInt(idMatch[1], 10);
-    }
+    if (idMatch) eventId = parseInt(idMatch[1], 10);
   }
 
   if (!eventId || isNaN(eventId)) {
@@ -393,8 +308,7 @@ const checkEventAvailabilityNode = async (state) => {
         },
       },
     };
-  } catch (err) {
-    // 404 ApiError or non-existent event
+  } catch {
     return {
       toolResult: {
         success: false,
@@ -407,10 +321,6 @@ const checkEventAvailabilityNode = async (state) => {
   }
 };
 
-/**
- * NODE: General Response
- * Provides platform context for greetings, booking instructions, and organizer queries.
- */
 const generalResponseNode = async () => {
   return {
     toolResult: {
@@ -431,16 +341,11 @@ const generalResponseNode = async () => {
           "3. Click 'Create Event', enter details, venue, ticket price, and seat quota.",
           "4. Publish and monitor ticket sales, revenue, and attendees in real time.",
         ],
-        paymentMethods: "Razorpay (UPI, Credit/Debit cards, Net Banking, and popular Wallets).",
       },
     },
   };
 };
 
-/**
- * CONDITIONAL ROUTING EDGE
- * Directs execution from understandRequest to the appropriate tool node.
- */
 const routeAction = (state) => {
   const action = state.intent?.action;
   switch (action) {
@@ -456,15 +361,9 @@ const routeAction = (state) => {
   }
 };
 
-/**
- * NODE: Generate Response
- * Synthesizes toolResult and user message into natural language.
- * Contains bulletproof fallback if Groq API is unavailable.
- */
 const generateResponseNode = async (state) => {
   const { message, history, toolResult } = state;
 
-  // Fallback response generator in case Groq is unavailable or fails
   const buildFallbackAnswer = () => {
     if (!toolResult) {
       return "Hello! I am your Eventify AI Assistant. You can ask me to find events, check ticket availability, or view your bookings.";
@@ -520,7 +419,7 @@ const generateResponseNode = async (state) => {
       if (q.includes("host") || q.includes("organizer") || q.includes("create")) {
         return "To host an event on Eventify:\n1. Register or log in with an Organizer account.\n2. Navigate to your Organizer Dashboard from the top menu.\n3. Click 'Create Event' and enter event details, venue, date, and ticket price.\n4. Publish and start selling tickets immediately!";
       }
-      return "Hi there! 👋 I am your Eventify AI Assistant. You can ask me to find events (e.g., 'Find React events in Ranchi', 'Events under ₹500'), check seat availability, or view your bookings.";
+      return "Hi there! 👋 I am your Eventify AI Assistant. You can ask me to find events, check seat availability, or view your bookings.";
     }
 
     return "I'm here to help you with events, tickets, and bookings on Eventify! How can I assist you today?";
@@ -538,11 +437,9 @@ ${JSON.stringify(toolResult, null, 2)}
 
 Instructions:
 - Answer the user's message accurately using the provided context from database.
-- IMPORTANT: You MUST respond in conversational markdown text only. DO NOT attempt to call any tools or output tool/function syntax.
-- If the toolResult indicates authenticated: false for bookings, explain politely that they must log in to view their bookings.
-- If events are found, present them cleanly with bullet points, names, dates, locations, prices in INR (₹), and remaining seats.
-- If checking availability, clearly state if tickets are available or sold out, and specify the remaining seat count.
-- If no events are found or an event ID doesn't exist, politely inform the user and suggest exploring other events.
+- Respond in conversational markdown text only. DO NOT attempt to call any tools or output tool syntax.
+- If toolResult indicates authenticated: false, politely ask the user to log in.
+- Present events cleanly with bullet points, names, dates, locations, prices in INR (₹), and remaining seats.
 - Keep formatting clean using standard markdown with bolding and bullet points. Do not include raw JSON.`;
 
     const completion = await groq.chat.completions.create({
@@ -558,26 +455,18 @@ Instructions:
 
     const reply = completion.choices[0]?.message?.content?.trim();
     return { response: reply || buildFallbackAnswer() };
-  } catch (err) {
-    console.error("Generate response fallback triggered:", err.message);
+  } catch {
     return { response: buildFallbackAnswer() };
   }
 };
 
-// ============================================================================
-// 4. LANGGRAPH WORKFLOW SETUP & COMPILATION
-// ============================================================================
-
 const workflow = new StateGraph(AgentState)
-  // Register Nodes
   .addNode("understandRequest", understandRequestNode)
   .addNode("searchEvents", searchEventsNode)
   .addNode("getUserBookings", getUserBookingsNode)
   .addNode("checkEventAvailability", checkEventAvailabilityNode)
   .addNode("generalResponse", generalResponseNode)
   .addNode("generateResponse", generateResponseNode)
-
-  // Register Edges
   .addEdge(START, "understandRequest")
   .addConditionalEdges("understandRequest", routeAction, {
     searchEvents: "searchEvents",
@@ -591,22 +480,8 @@ const workflow = new StateGraph(AgentState)
   .addEdge("generalResponse", "generateResponse")
   .addEdge("generateResponse", END);
 
-// Compile the LangGraph graph
 export const eventifyAgent = workflow.compile();
 
-// ============================================================================
-// 5. PUBLIC API SERVICE HANDLER
-// ============================================================================
-
-/**
- * Main entry point for chatting with the LangGraph agent.
- *
- * @param {Object} params
- * @param {string} params.message - Current user query
- * @param {Array}  [params.history] - Previous chat history [{ role, content }]
- * @param {number|null} [params.userId] - Authenticated user ID (from verified JWT only)
- * @returns {Promise<string>} - Final assistant response text
- */
 export const chatWithAgent = async ({ message, history = [], userId = null }) => {
   const initialState = {
     userId,
@@ -621,6 +496,5 @@ export const chatWithAgent = async ({ message, history = [], userId = null }) =>
   return finalState.response;
 };
 
-// Backward-compatible export alias for any legacy callers
 export const chatWithAssistant = (message, history = []) =>
   chatWithAgent({ message, history, userId: null });

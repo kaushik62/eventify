@@ -4,10 +4,8 @@ import { authenticateUser, authorizeRole } from "../middleware/auth.middleware.j
 
 const router = Router();
 
-// Retrieve uploaded images
 router.get("/image/*", uploadController.getImage);
 
-// Direct presigned upload
 router.post(
   "/presigned-url",
   authenticateUser,
@@ -15,7 +13,6 @@ router.post(
   uploadController.getPresignedUrl
 );
 
-// S3 upload endpoint
 router.post(
   "/image",
   authenticateUser,
@@ -24,3 +21,4 @@ router.post(
 );
 
 export default router;
+

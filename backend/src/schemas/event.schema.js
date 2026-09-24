@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Schema for creating an event
 export const createEventSchema = z.object({
   name: z.string().min(3, "Event name must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -19,10 +18,8 @@ export const createEventSchema = z.object({
   imageUrl: z.string().url().optional(),
 });
 
-// Schema for updating an event (all fields optional)
 export const updateEventSchema = createEventSchema.partial();
 
-// Schema for querying/filtering events
 export const eventQuerySchema = z.object({
   search: z.string().optional(),
   category: z.string().optional(),
@@ -37,3 +34,4 @@ export const eventQuerySchema = z.object({
   (filters) => filters.minPrice === undefined || filters.maxPrice === undefined || filters.minPrice <= filters.maxPrice,
   { message: "Minimum price cannot exceed maximum price" }
 );
+

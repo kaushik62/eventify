@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Zod validation schema for incoming AI chat requests
 export const chatRequestSchema = z.object({
   message: z
     .string({ required_error: "Message is required" })
@@ -16,3 +15,4 @@ export const chatRequestSchema = z.object({
     .optional()
     .default([]),
 });
+

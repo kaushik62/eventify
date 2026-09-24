@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Schema for booking an event
 export const createBookingSchema = z
   .object({
     eventId: z.number().int().positive("Invalid event ID"),
@@ -11,4 +10,5 @@ export const createBookingSchema = z
     eventId: data.eventId,
     tickets: data.tickets || data.seatsBooked || 1,
   }));
+
 
