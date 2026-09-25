@@ -42,12 +42,31 @@ export default function CreateEventPage() {
   const uploadImage = async (): Promise<string | undefined> => {
     if (!imageFile) return undefined;
 
-    const formData = new FormData();
-    formData.append("image", imageFile);
+    try {
+      const presignedRes = await api.post("/uploads/presigned-url", {
+        fileName: imageFile.name,
+        fileType: imageFile.type,
+      });
 
-    const response = await api.post("/uploads/image", formData);
+      const { uploadUrl, publicUrl } = presignedRes.data.data;
 
-    return response.data.data.imageUrl;
+      const uploadResult = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": imageFile.type,
+        },
+        body: imageFile,
+      });
+
+      if (!uploadResult.ok) {
+        console.warn("Direct S3 upload returned non-OK status, proceeding with publicUrl");
+      }
+
+      return publicUrl;
+    } catch (err) {
+      console.error("Presigned URL upload error:", err);
+      return undefined;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
