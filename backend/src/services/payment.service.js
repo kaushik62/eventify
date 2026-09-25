@@ -94,4 +94,3 @@ export const verifyRazorpayPayment = async (input, userId) => {
 
   return confirmBooking(payment.booking_id);
 };
-
