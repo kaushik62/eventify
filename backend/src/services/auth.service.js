@@ -1,54 +1,49 @@
 import bcrypt from "bcrypt";
 import { query } from "../db/db.js";
-import { signToken } from "../utils/jwt.js";
-import { ApiError } from "../utils/apiResponse.js";
+import { signToken } from "../middleware/auth.middleware.js";
 
-const SALT_ROUNDS = 10;
+export const registerUser = async ({ name, email, password, role }) => {
+  const { rows } = await query("SELECT id FROM users WHERE email = $1", [email]);
 
-export const registerUser = async (input) => {
-  const existing = await query("SELECT id FROM users WHERE email = $1", [input.email]);
-  if (existing.rows.length > 0) {
-    throw new ApiError(409, "An account with this email already exists");
-  }
+  if (rows.length) throw new Error("Email already exists");
 
-  const hashedPassword = await bcrypt.hash(input.password, SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  const result = await query(
+  const { rows: [user] } = await query(
     `INSERT INTO users (name, email, password, role)
      VALUES ($1, $2, $3, $4)
      RETURNING id, name, email, role, created_at`,
-    [input.name, input.email, hashedPassword, input.role]
+    [name, email, hashedPassword, role]
   );
 
-  const user = result.rows[0];
-  const token = signToken({ id: user.id, role: user.role });
-  return { user, token };
+  return { user, token: signToken({ id: user.id, role: user.role }) };
 };
 
-export const loginUser = async (input) => {
-  const result = await query(
+export const loginUser = async ({ email, password }) => {
+  const { rows } = await query(
     "SELECT id, name, email, password, role FROM users WHERE email = $1",
-    [input.email]
+    [email]
   );
-  const user = result.rows[0];
 
-  if (!user || !(await bcrypt.compare(input.password, user.password))) {
-    throw new ApiError(401, "Invalid email or password");
+  const user = rows[0];
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    throw new Error("Invalid email or password");
   }
 
   const token = signToken({ id: user.id, role: user.role });
   delete user.password;
+
   return { user, token };
 };
 
 export const getUserById = async (id) => {
-  const result = await query(
+  const { rows } = await query(
     "SELECT id, name, email, role, created_at FROM users WHERE id = $1",
     [id]
   );
-  if (result.rows.length === 0) {
-    throw new ApiError(404, "User not found");
-  }
-  return result.rows[0];
-};
 
+  if (!rows.length) throw new Error("User not found");
+
+  return rows[0];
+};
