@@ -99,10 +99,6 @@ export default function OrganizerDashboardPage() {
 
           <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                Organizer Dashboard
-              </div>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Welcome back,{" "}
                 <span className="text-primary">{user?.name?.split(" ")[0]}</span>

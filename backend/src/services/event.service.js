@@ -102,7 +102,6 @@ export const getEventById = async (id) => {
 };
 
 export const createEvent = async (organizerId, input) => {
-  const fallbackImage = "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=1200";
 
   const result = await query(
     `INSERT INTO events
@@ -120,7 +119,7 @@ export const createEvent = async (organizerId, input) => {
       input.eventTime,
       input.price,
       input.totalSeats,
-      input.imageUrl || fallbackImage,
+      input.imageUrl,
     ]
   );
   return result.rows[0];

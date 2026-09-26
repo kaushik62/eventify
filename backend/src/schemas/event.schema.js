@@ -15,7 +15,8 @@ export const createEventSchema = z.object({
     .transform((t) => t.slice(0, 5)),
   price: z.number().nonnegative("Price must be 0 or greater"),
   totalSeats: z.number().int().positive("Seats must be at least 1"),
-  imageUrl: z.string().url().optional(),
+
+  imageUrl: z.string({required_error: "Image is required"}).url("Please provide a image"),
 });
 
 export const updateEventSchema = createEventSchema.partial();

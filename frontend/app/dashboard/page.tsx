@@ -7,7 +7,6 @@ import {
   Calendar,
   MapPin,
   Ticket,
-  ArrowUpRight,
   Clock3,
   Sparkles,
 } from "lucide-react";
@@ -71,11 +70,6 @@ export default function DashboardPage() {
 
           <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5" />
-                Your event dashboard
-              </div>
-
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Welcome back,{" "}
                 <span className="text-primary">
@@ -167,8 +161,6 @@ function StatCard({
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
           {icon}
         </div>
-
-        <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
       </div>
 
       <div className="mt-5">

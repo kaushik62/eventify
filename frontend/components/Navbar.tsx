@@ -18,8 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
 const navLinks = [
-  { href: "/events", label: "Explore" },
-  { href: "/about", label: "About" },
+  { href: "/events", label: "Explore", userOnly: true },
 ];
 
 export function Navbar() {
@@ -31,16 +30,22 @@ export function Navbar() {
 
   const pathname = usePathname();
 
-  // Dashboard route based on user role
-  const dashboardLink =
-    user?.role === "ADMIN"
-      ? "/admin/dashboard"
-      : user?.role === "ORGANIZER"
-        ? "/organizer"
-        : "/dashboard";
-
   const isUser = user?.role === "USER";
   const isOrganizer = user?.role === "ORGANIZER";
+  const isAdmin = user?.role === "ADMIN";
+
+  // Dashboard route based on role
+  const dashboardLink = isAdmin
+    ? "/admin/dashboard"
+    : isOrganizer
+      ? "/organizer"
+      : "/dashboard";
+
+  // Explore is visible only to USER.
+  // About is visible to everyone.
+  const visibleNavLinks = navLinks.filter(
+    ({ userOnly }) => !userOnly || isUser
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,12 +92,13 @@ export function Navbar() {
           <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 gradient-brand text-white shadow-lg shadow-black/30 transition-transform duration-300 group-hover:rotate-3">
             <CalendarDays className="h-4 w-4" />
           </span>
+
           Event<span className="text-primary">ify</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-1 md:flex">
-          {navLinks.map(({ href, label }) => (
+          {visibleNavLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
@@ -128,6 +134,7 @@ export function Navbar() {
               {/* User Dropdown */}
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-2 text-sm font-medium text-foreground transition-all hover:bg-white/[0.1]"
                   aria-expanded={dropdownOpen}
@@ -150,7 +157,7 @@ export function Navbar() {
 
                 {dropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-2xl border border-white/10 bg-[hsl(220_28%_10%/0.98)] shadow-glass-xl backdrop-blur-2xl">
-                    {/* User Info */}
+                    {/* User Information */}
                     <div className="border-b border-white/10 px-4 py-3">
                       <p className="text-xs font-medium text-muted-foreground">
                         Signed in as
@@ -202,6 +209,7 @@ export function Navbar() {
 
                       {/* Sign Out */}
                       <button
+                        type="button"
                         className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-400/10"
                         onClick={handleLogout}
                       >
@@ -233,12 +241,17 @@ export function Navbar() {
 
         {/* Mobile Menu Toggle */}
         <button
+          type="button"
           className="rounded-xl border border-white/10 bg-white/[0.05] p-2.5 transition-colors hover:bg-white/[0.1] md:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
           aria-expanded={open}
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {open ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </button>
       </nav>
 
@@ -246,8 +259,8 @@ export function Navbar() {
       {open && (
         <div className="border-t border-white/10 bg-[hsl(222_36%_5%/0.98)] px-4 py-4 backdrop-blur-2xl md:hidden">
           <div className="flex flex-col gap-1">
-            {/* Public Navigation */}
-            {navLinks.map(({ href, label }) => (
+            {/* Role-based Navigation */}
+            {visibleNavLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
@@ -266,14 +279,16 @@ export function Navbar() {
 
             {user ? (
               <>
-                {/* User Info */}
+                {/* User Information */}
                 <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-4 py-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-sm font-bold text-primary">
                     {user.name.charAt(0).toUpperCase()}
                   </span>
 
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold">{user.name}</p>
+                    <p className="text-sm font-semibold">
+                      {user.name}
+                    </p>
 
                     <p className="truncate text-xs text-muted-foreground">
                       {user.email}
@@ -321,6 +336,7 @@ export function Navbar() {
 
                 {/* Sign Out */}
                 <button
+                  type="button"
                   className="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition-colors hover:bg-red-400/5"
                   onClick={handleLogout}
                 >
@@ -338,8 +354,14 @@ export function Navbar() {
                   Log in
                 </Link>
 
-                <Link href="/register" onClick={() => setOpen(false)}>
-                  <Button size="sm" className="mt-1 h-11 w-full rounded-xl">
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                >
+                  <Button
+                    size="sm"
+                    className="mt-1 h-11 w-full rounded-xl"
+                  >
                     Get Started
                   </Button>
                 </Link>
@@ -349,7 +371,7 @@ export function Navbar() {
         </div>
       )}
 
-      {/* Click outside to close dropdown */}
+      {/* Click Outside to Close Dropdown */}
       {dropdownOpen && (
         <div
           className="fixed inset-0 z-[-1]"
