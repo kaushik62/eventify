@@ -1,6 +1,8 @@
 import { query, withTransaction } from "../db/db.js";
 import { ApiError } from "../utils/apiResponse.js";
 
+import { sendBookingConfirmation } from "./send_email.js";
+
 export const createBooking = async (userId, input) => {
   return withTransaction(async (client) => {
     const eventResult = await client.query(
@@ -47,16 +49,68 @@ export const createBooking = async (userId, input) => {
 
 export const confirmBooking = async (bookingId) => {
   const result = await query(
-    `UPDATE bookings SET status = 'CONFIRMED'
-     WHERE id = $1 AND status = 'PENDING' RETURNING *`,
+    `UPDATE bookings
+     SET status = 'CONFIRMED'
+     WHERE id = $1 AND status = 'PENDING'
+     RETURNING *`,
     [bookingId]
   );
+
+  // If the booking was already confirmed, don't send another email.
   if (result.rows.length === 0) {
-    const existing = await query("SELECT * FROM bookings WHERE id = $1", [bookingId]);
-    if (existing.rows[0]?.status === "CONFIRMED") return existing.rows[0];
-    throw new ApiError(409, "This booking is no longer awaiting payment");
+    const existing = await query(
+      "SELECT * FROM bookings WHERE id = $1",
+      [bookingId]
+    );
+
+    if (existing.rows[0]?.status === "CONFIRMED") {
+      return existing.rows[0];
+    }
+
+    throw new ApiError(
+      409,
+      "This booking is no longer awaiting payment"
+    );
   }
-  return result.rows[0];
+
+  const booking = result.rows[0];
+
+  // Get user and event details for the confirmation email.
+  const detailsResult = await query(
+    `SELECT
+       u.name AS user_name,
+       u.email AS user_email,
+       e.name AS event_name,
+       e.event_date,
+       e.event_time,
+       e.location
+     FROM bookings b
+     JOIN users u ON u.id = b.user_id
+     JOIN events e ON e.id = b.event_id
+     WHERE b.id = $1`,
+    [bookingId]
+  );
+
+  const details = detailsResult.rows[0];
+
+  // Send the email without affecting booking confirmation.
+  try {
+    await sendBookingConfirmation({
+      email: details.user_email,
+      name: details.user_name,
+      eventName: details.event_name,
+      bookingId: booking.id,
+      date: details.event_date,
+      time: details.event_time,
+      location: details.location,
+      seats: booking.tickets,
+      amount: booking.total_amount,
+    });
+  } catch (error) {
+    console.error("Booking confirmation email failed:", error);
+  }
+
+  return booking;
 };
 
 export const failBooking = async (bookingId) => {
