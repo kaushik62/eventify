@@ -26,6 +26,21 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const redirectByRole = (role: string) => {
+    switch (role) {
+      case "ORGANIZER":
+        router.replace("/organizer");
+        break;
+
+      case "ADMIN":
+        router.replace("/admin/dashboard");
+        break;
+
+      default:
+        router.replace("/dashboard");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -33,10 +48,7 @@ export default function LoginPage() {
 
     try {
       const user = await login(email, password);
-
-      if (user.role === "ADMIN") router.push("/admin");
-      else if (user.role === "ORGANIZER") router.push("/organizer");
-      else router.push("/dashboard");
+      redirectByRole(user.role);
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
     } finally {
@@ -54,11 +66,9 @@ export default function LoginPage() {
       </div>
 
       <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
-
         {/* Left: Brand section */}
         <section className="hidden lg:block">
           <div className="max-w-xl">
-
             {/* Brand badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3.5 py-2 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
@@ -75,8 +85,8 @@ export default function LoginPage() {
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
-              Discover amazing events, reserve your tickets, and keep
-              everything you love in one place.
+              Discover amazing events, reserve your tickets, and keep everything
+              you love in one place.
             </p>
 
             {/* Feature cards */}
@@ -105,7 +115,6 @@ export default function LoginPage() {
         {/* Right: Login */}
         <section className="mx-auto w-full max-w-md">
           <div className="glass-strong p-7 sm:p-9">
-
             {/* Mobile logo / heading */}
             <div className="mb-8 text-center lg:text-left">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary lg:mx-0">
@@ -134,7 +143,6 @@ export default function LoginPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
-
               {/* Email */}
               <div>
                 <label
@@ -163,10 +171,7 @@ export default function LoginPage() {
               {/* Password */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="text-sm font-semibold"
-                  >
+                  <label htmlFor="password" className="text-sm font-semibold">
                     Password
                   </label>
                 </div>
@@ -235,8 +240,7 @@ export default function LoginPage() {
             </Link>
 
             <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
-              By continuing, you agree to use Eventify responsibly and
-              securely.
+              By continuing, you agree to use Eventify responsibly and securely.
             </p>
           </div>
         </section>
