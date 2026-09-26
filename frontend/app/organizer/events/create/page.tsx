@@ -50,9 +50,15 @@ export default function CreateEventPage() {
   const uploadImage = async (): Promise<string | undefined> => {
     if (!imageFile) return undefined;
 
+    const fileType = imageFile.type || "image/jpeg";
+
+    if (imageFile.size > 10 * 1024 * 1024) {
+      throw new Error("Image file size exceeds 10 MB limit.");
+    }
+
     const presignedRes = await api.post("/uploads/presigned-url", {
       fileName: imageFile.name,
-      fileType: imageFile.type,
+      fileType,
     });
 
     const { uploadUrl, publicUrl } = presignedRes.data.data;
@@ -64,7 +70,7 @@ export default function CreateEventPage() {
     const uploadResult = await fetch(uploadUrl, {
       method: "PUT",
       headers: {
-        "Content-Type": imageFile.type,
+        "Content-Type": fileType,
       },
       body: imageFile,
     });
@@ -97,7 +103,11 @@ export default function CreateEventPage() {
       });
       router.push("/organizer/events");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to create event");
+      const message =
+        err?.message ||
+        err?.response?.data?.message ||
+        "Failed to create event";
+      setError(message);
     } finally {
       setSubmitting(false);
     }
