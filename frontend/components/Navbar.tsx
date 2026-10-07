@@ -89,11 +89,7 @@ export function Navbar() {
           href="/"
           className="group flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground"
         >
-          <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 gradient-brand text-white shadow-lg shadow-black/30 transition-transform duration-300 group-hover:rotate-3">
-            <CalendarDays className="h-4 w-4" />
-          </span>
-
-          Event<span className="text-primary">ify</span>
+          Eventify
         </Link>
 
         {/* Desktop Navigation */}

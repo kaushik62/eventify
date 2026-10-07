@@ -158,10 +158,7 @@ export default function FAQPage() {
 
         {/* Header */}
         <div className="mx-auto max-w-2xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
-            <HelpCircle className="h-3.5 w-3.5 text-primary" />
-            Help Center
-          </div>
+         
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Frequently Asked <span className="gradient-text">Questions</span>
           </h1>

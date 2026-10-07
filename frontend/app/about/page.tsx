@@ -95,10 +95,7 @@ export default function AboutPage() {
 
         <div className="relative mx-auto max-w-[88rem] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Our story
-            </div>
+           
             <h1 className="text-5xl font-black leading-tight tracking-[-0.04em] sm:text-6xl lg:text-7xl">
               We&apos;re building the
               <span className="block gradient-text">future of events</span>

@@ -106,6 +106,9 @@ export const confirmBooking = async (bookingId) => {
       seats: booking.tickets,
       amount: booking.total_amount,
     });
+
+    console.log("Booking confirmation email sent");
+    
   } catch (error) {
     console.error("Booking confirmation email failed:", error);
   }

@@ -41,11 +41,9 @@ export function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-1">
             <Link href="/" className="group inline-flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/15 gradient-brand text-white transition-transform duration-300 group-hover:rotate-3">
-                <CalendarDays className="h-4 w-4" />
-              </span>
+       
               <p className="text-lg font-bold text-foreground">
-                Event<span className="text-primary">ify</span>
+                Eventify
               </p>
             </Link>
 

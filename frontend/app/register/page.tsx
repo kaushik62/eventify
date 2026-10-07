@@ -65,12 +65,6 @@ export default function RegisterPage() {
         <section className="hidden lg:block">
           <div className="max-w-xl">
 
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3.5 py-2 text-xs font-semibold backdrop-blur-sm">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Join Eventify
-            </div>
-
             {/* Heading */}
             <h1 className="mt-7 text-5xl font-bold leading-[1.08] tracking-tight xl:text-6xl">
               Discover.

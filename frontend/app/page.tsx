@@ -102,12 +102,7 @@ export default function HomePage() {
 
             {/* Hero content */}
             <div className="max-w-3xl">
-              <div className="reveal-up inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-muted-foreground shadow-lg backdrop-blur-xl">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20">
-                  <Sparkles className="h-3 w-3 text-primary" />
-                </span>
-                The smarter way to make plans
-              </div>
+             
 
               <h1 className="reveal-up reveal-delay-1 mt-7 max-w-2xl text-5xl font-black leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-7xl xl:text-[78px]">
                 The plans you&apos;ll
@@ -354,10 +349,6 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-[88rem] px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
-                Hand-picked
-              </div>
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Events worth discovering
               </h2>
@@ -394,10 +385,7 @@ export default function HomePage() {
         <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/8 blur-[100px]" />
         <div className="relative mx-auto max-w-[88rem] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
-              <Zap className="h-3.5 w-3.5 text-primary" />
-              Simple by design
-            </div>
+            
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               From discovery to memories
             </h2>
@@ -447,10 +435,7 @@ export default function HomePage() {
 
           <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
             <div className="max-w-2xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold backdrop-blur-sm">
-                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                Trusted experiences
-              </div>
+             
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Ready for your next unforgettable experience?
               </h2>

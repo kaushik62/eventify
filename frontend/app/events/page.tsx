@@ -93,10 +93,6 @@ function EventsContent() {
           <div className="absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-violet-500/10 blur-3xl" />
 
           <div className="relative px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              The Eventify edit
-            </div>
 
             <div className="mt-5 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
