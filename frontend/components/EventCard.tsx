@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, MapPin, Sparkles, Users, Clock, Tag } from "lucide-react";
+import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
 import { EventItem } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { getEventImageUrl } from "@/lib/image";
 
 export function EventCard({ event }: { event: EventItem }) {
-  const date = new Date(event.event_date).toLocaleDateString("en-IN", {
+  const dateFormatted = new Date(event.event_date).toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -16,7 +16,6 @@ export function EventCard({ event }: { event: EventItem }) {
   const isAlmostFull = seatsLeft > 0 && seatsLeft <= 10;
   const isSoldOut = seatsLeft === 0;
 
-  // Format time nicely
   const formatTime = (time: string) => {
     if (!time) return "";
     const [h, m] = time.split(":");
@@ -26,103 +25,101 @@ export function EventCard({ event }: { event: EventItem }) {
     return `${displayHour}:${m} ${ampm}`;
   };
 
-  return (
-    <article className="card-hover group block h-full overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.075] via-white/[0.04] to-primary/[0.03] shadow-glass backdrop-blur-xl">
+  const imageUrl = getEventImageUrl(event.image_url);
 
-      {/* Image section */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface">
-        {getEventImageUrl(event.image_url) ? (
+  return (
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-card-hover">
+      {/* Cover Image Container */}
+      <Link href={`/events/${event.id}`} className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
+        {imageUrl ? (
           <Image
-            src={getEventImageUrl(event.image_url) || ""}
+            src={imageUrl}
             alt={event.name}
             fill
             unoptimized
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-102"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 gradient-brand px-6 text-center text-white">
-            <CalendarDays className="h-10 w-10 opacity-70" />
-            <span className="text-sm font-semibold opacity-90">{event.category} experience</span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-slate-50 text-slate-400">
+            <CalendarDays className="h-8 w-8 text-slate-300" />
+            <span className="text-xs font-medium text-slate-500">{event.category}</span>
           </div>
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Category badge */}
-        <Badge className="absolute left-5 top-5 border border-white/20 bg-background/60 text-foreground backdrop-blur-md">
-          <Tag className="mr-1 h-3 w-3" />
-          {event.category}
-        </Badge>
-
-        {/* Status badges */}
-        {isSoldOut ? (
-          <Badge className="absolute right-5 top-5 border-0 bg-red-500/90 text-white">
-            Sold Out
-          </Badge>
-        ) : isAlmostFull ? (
-          <Badge className="absolute right-5 top-5 border-0 bg-amber-400/90 text-amber-950">
-            {seatsLeft} left
-          </Badge>
-        ) : null}
-
-        {/* Invisible link overlay */}
-        <Link href={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View ${event.name}`} />
-
-        {/* Bottom info overlay */}
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 text-white">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">{date}</p>
-            {event.event_time && (
-              <p className="mt-0.5 text-xs text-white/55">{formatTime(event.event_time)}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm">
-            <Sparkles className="h-3 w-3 text-primary" />
-            Top pick
-          </div>
+        {/* Category Pill Tag */}
+        <div className="absolute left-3 top-3 z-10">
+          <span className="inline-flex items-center rounded-md bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-slate-800 shadow-subtle backdrop-blur-sm border border-slate-200/60">
+            {event.category}
+          </span>
         </div>
-      </div>
 
-      {/* Content section */}
-      <Link href={`/events/${event.id}`} className="block space-y-4 p-6 sm:p-7">
-        <div>
-          <h3 className="line-clamp-2 text-lg font-bold leading-tight tracking-[-0.02em] text-foreground transition-colors group-hover:text-primary sm:text-[1.2rem]">
+        {/* Seat Availability Status */}
+        {isSoldOut ? (
+          <div className="absolute right-3 top-3 z-10">
+            <Badge variant="destructive" className="shadow-subtle">
+              Sold out
+            </Badge>
+          </div>
+        ) : isAlmostFull ? (
+          <div className="absolute right-3 top-3 z-10">
+            <Badge variant="warning" className="shadow-subtle">
+              {seatsLeft} left
+            </Badge>
+          </div>
+        ) : null}
+      </Link>
+
+      {/* Content Details */}
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        {/* Date & Time metadata */}
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+          <CalendarDays className="h-3.5 w-3.5" />
+          <span>
+            {dateFormatted}
+            {event.event_time ? ` • ${formatTime(event.event_time)}` : ""}
+          </span>
+        </div>
+
+        {/* Title */}
+        <Link href={`/events/${event.id}`} className="mt-1.5 block">
+          <h3 className="line-clamp-1 text-base font-semibold text-slate-900 transition-colors group-hover:text-primary">
             {event.name}
           </h3>
-          {event.description && (
-            <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-muted-foreground">
-              {event.description}
-            </p>
-          )}
+        </Link>
+
+        {/* Description snippet */}
+        {event.description && (
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+            {event.description}
+          </p>
+        )}
+
+        {/* Location venue */}
+        <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600">
+          <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+          <span className="truncate">{event.location}</span>
         </div>
 
-        <div className="space-y-2">
-          <p className="flex items-center gap-2 truncate text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-accent" />
-            {event.location}
-          </p>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-3.5 w-3.5 shrink-0 text-accent" />
-            {date}{event.event_time ? ` · ${formatTime(event.event_time)}` : ""}
-          </p>
-        </div>
-
-        {/* Price + CTA */}
-        <div className="flex items-center justify-between border-t border-white/10 pt-4">
+        {/* Footer: Price & CTA */}
+        <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">From</p>
-            <span className="text-xl font-bold tracking-tight text-foreground">
+            <span className="block text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              Price
+            </span>
+            <span className="text-sm font-bold text-slate-900">
               ₹{Number(event.price).toLocaleString("en-IN")}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground">
-            <Users className="h-3.5 w-3.5" />
-            Book now
-          </div>
+          <Link
+            href={`/events/${event.id}`}
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-primary/40 hover:bg-primary hover:text-white"
+          >
+            <span>Book</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
-      </Link>
+      </div>
     </article>
   );
 }

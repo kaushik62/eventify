@@ -8,25 +8,16 @@ import {
   MapPin,
   Ticket,
   Clock3,
-  Sparkles,
+  ArrowRight,
+  Compass,
 } from "lucide-react";
 
 import { getEventImageUrl } from "@/lib/image";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
 import { Booking } from "@/lib/types";
 import { useAuth } from "@/lib/auth";
-
-const statusColor: Record<string, string> = {
-  CONFIRMED:
-    "border-emerald-400/20 bg-emerald-400/10 text-emerald-300",
-  PENDING:
-    "border-amber-400/20 bg-amber-400/10 text-amber-300",
-  CANCELLED:
-    "border-white/10 bg-white/[0.05] text-white/55",
-  FAILED:
-    "border-red-400/20 bg-red-400/10 text-red-300",
-};
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -34,10 +25,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const load = () => {
-    api.get("/bookings").then((res) => {
-      setBookings(res.data.data);
-      setLoading(false);
-    });
+    api
+      .get("/bookings")
+      .then((res) => {
+        setBookings(res.data.data);
+      })
+      .catch(() => setBookings([]))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -56,166 +50,133 @@ export default function DashboardPage() {
   const past = bookings.filter((b) => !upcoming.includes(b));
 
   return (
-    <main className="page-surface relative min-h-screen overflow-hidden">
-      <div className="paper-grid pointer-events-none absolute inset-0 opacity-40" />
-      <div className="pointer-events-none absolute -left-40 top-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-40 bottom-20 h-[28rem] w-[28rem] rounded-full bg-accent/10 blur-3xl" />
+    <main className="min-h-screen bg-background py-8 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header Strip */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Welcome back, {user?.name?.split(" ")[0] || "Attendee"}
+            </h1>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Manage your event reservations, e-tickets, and booking receipts.
+            </p>
+          </div>
 
-      <div className="relative mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+          <Link href="/events">
+            <Button size="sm">
+              <Compass className="h-4 w-4 mr-1.5" />
+              Discover Events
+            </Button>
+          </Link>
+        </div>
 
-        {/* Header */}
-        <section className="premium-panel relative overflow-hidden p-7 sm:p-9">
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
-
-          <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                Welcome back,{" "}
-                <span className="text-primary">
-                  {user?.name?.split(" ")[0]}
-                </span>
-              </h1>
-
-              <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-                Keep track of your upcoming events and manage all your
-                bookings in one place.
-              </p>
+        {/* Stats Strip */}
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-border bg-white p-5 shadow-card">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Calendar className="h-4 w-4 text-primary" />
+              <span>Upcoming Events</span>
             </div>
+            <p className="mt-2 text-2xl font-black text-slate-900">
+              {upcoming.length}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Active tickets ready for admission
+            </p>
+          </div>
 
-            <div className="hidden shrink-0 rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-sm sm:block">
-              <Ticket className="h-8 w-8 text-primary" />
+          <div className="rounded-xl border border-border bg-white p-5 shadow-card">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Ticket className="h-4 w-4 text-indigo-600" />
+              <span>Total Bookings</span>
+            </div>
+            <p className="mt-2 text-2xl font-black text-slate-900">
+              {bookings.length}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Across all categories
+            </p>
+          </div>
+
+          <div className="col-span-2 sm:col-span-1 rounded-xl border border-border bg-white p-5 shadow-card">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Clock3 className="h-4 w-4 text-slate-500" />
+              <span>Account Type</span>
+            </div>
+            <p className="mt-2 text-2xl font-black text-slate-900">
+              {user?.role || "USER"}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {user?.email}
+            </p>
+          </div>
+        </div>
+
+        {/* Upcoming Bookings Section */}
+        <section className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900">
+                Upcoming Events
+              </h2>
+              <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                {upcoming.length}
+              </span>
             </div>
           </div>
-        </section>
 
-        {/* Stats */}
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
-          <StatCard
-            icon={<Calendar className="h-5 w-5" />}
-            label="Upcoming Events"
-            value={upcoming.length}
-            description="Confirmed events ahead"
-          />
-
-          <StatCard
-            icon={<Ticket className="h-5 w-5" />}
-            label="Total Bookings"
-            value={bookings.length}
-            description="All your bookings"
+          <BookingList
+            bookings={upcoming}
+            loading={loading}
+            emptyTitle="No upcoming events"
+            emptyText="You haven't reserved any upcoming event tickets yet. Explore events to find your next plan."
           />
         </section>
 
-        {/* Upcoming */}
-        <section className="mt-12">
-          <SectionHeader
-            title="Upcoming Bookings"
-            description="Events you are attending"
-            count={upcoming.length}
-          />
-
-          <div className="mt-5">
-            <BookingList
-              bookings={upcoming}
-              loading={loading}
-              emptyText="No upcoming bookings yet."
-            />
+        {/* Past Bookings Section */}
+        <section className="mt-12 border-t border-border pt-10">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900">
+                Past & Inactive Bookings
+              </h2>
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                {past.length}
+              </span>
+            </div>
           </div>
-        </section>
 
-        {/* Past */}
-        <section className="mt-12 pb-10">
-          <SectionHeader
-            title="Past & Other Bookings"
-            description="Your previous and inactive bookings"
-            count={past.length}
+          <BookingList
+            bookings={past}
+            loading={loading}
+            emptyTitle="No past bookings"
+            emptyText="Your history of attended events and prior bookings will appear here."
           />
-
-          <div className="mt-5">
-            <BookingList
-              bookings={past}
-              loading={loading}
-              emptyText="Nothing here yet."
-            />
-          </div>
         </section>
       </div>
     </main>
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  description,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  description: string;
-}) {
-  return (
-    <div className="glass card-hover group p-6 sm:p-7">
-      <div className="flex items-start justify-between">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          {icon}
-        </div>
-      </div>
-
-      <div className="mt-5">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="mt-1 text-3xl font-bold tracking-tight">{value}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-      </div>
-    </div>
-  );
-}
-
-function SectionHeader({
-  title,
-  description,
-  count,
-}: {
-  title: string;
-  description: string;
-  count: number;
-}) {
-  return (
-    <div className="flex items-end justify-between gap-4">
-      <div>
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold tracking-tight">{title}</h2>
-
-          <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-            {count}
-          </span>
-        </div>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          {description}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function BookingList({
   bookings,
   loading,
+  emptyTitle,
   emptyText,
 }: {
   bookings: Booking[];
   loading: boolean;
+  emptyTitle: string;
   emptyText: string;
 }) {
   if (loading) {
     return (
-      <div className="grid gap-4 lg:grid-cols-2">
-        {[1, 2].map((item) => (
+      <div className="grid gap-4 sm:grid-cols-2">
+        {[1, 2].map((i) => (
           <div
-            key={item}
-            className="h-40 animate-pulse rounded-2xl border border-white/10 bg-white/[0.04]"
+            key={i}
+            className="h-36 animate-pulse rounded-xl border border-border bg-white"
           />
         ))}
       </div>
@@ -224,22 +185,18 @@ function BookingList({
 
   if (bookings.length === 0) {
     return (
-      <div className="glass rounded-2xl border-dashed px-6 py-12 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.05]">
-          <Ticket className="h-5 w-5 text-muted-foreground" />
-        </div>
-
-        <p className="mt-4 font-medium">{emptyText}</p>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your booked events will appear here.
+      <div className="rounded-xl border border-dashed border-border bg-white p-8 text-center">
+        <Ticket className="mx-auto h-8 w-8 text-slate-300" />
+        <p className="mt-2 text-xs font-semibold text-slate-800">{emptyTitle}</p>
+        <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
+          {emptyText}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2">
       {bookings.map((b) => (
         <BookingCard key={b.id} booking={b} />
       ))}
@@ -247,62 +204,59 @@ function BookingList({
   );
 }
 
-function BookingCard({
-  booking: b,
-}: {
-  booking: Booking;
-}) {
+function BookingCard({ booking: b }: { booking: Booking }) {
   const imageUrl = getEventImageUrl(b.image_url);
+  const isConfirmed = b.status === "CONFIRMED";
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "CONFIRMED":
+        return "success";
+      case "PENDING":
+        return "warning";
+      case "CANCELLED":
+      case "FAILED":
+        return "destructive";
+      default:
+        return "secondary";
+    }
+  };
 
   return (
-    <Link
-      href={`/booking/confirmation/${b.id}`}
-      aria-label={`View booking details for ${b.event_name || "your event"}`}
-      className="card-hover group block h-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.055] shadow-glass backdrop-blur-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-    >
-      <div className="flex gap-4 p-4 sm:p-5">
-
-        {/* Image */}
-        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] sm:h-28 sm:w-28">
+    <div className="flex flex-col justify-between rounded-xl border border-border bg-white p-4 sm:p-5 shadow-card transition-all duration-150 hover:border-slate-300 hover:shadow-card-hover">
+      <div className="flex gap-4">
+        {/* Thumbnail */}
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-24">
           {imageUrl ? (
             <Image
               src={imageUrl}
-              alt={b.event_name || "Event"}
+              alt={b.event_name || "Event thumbnail"}
               fill
               unoptimized
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <Ticket className="h-7 w-7 text-muted-foreground" />
+            <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400">
+              <Ticket className="h-6 w-6" />
             </div>
           )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         </div>
 
-        {/* Content */}
+        {/* Info */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="line-clamp-2 font-semibold leading-snug">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="line-clamp-1 text-sm font-bold text-slate-900">
               {b.event_name}
             </h3>
-
-            <Badge
-              // variant="outline"
-              className={`shrink-0 text-[11px] font-medium ${statusColor[b.status]}`}
-            >
+            <Badge variant={getStatusBadgeVariant(b.status) as any}>
               {b.status}
             </Badge>
           </div>
 
-          <div className="mt-3 space-y-2">
+          <div className="mt-2 space-y-1 text-xs text-muted-foreground">
             {b.event_date && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white/[0.05]">
-                  <Calendar className="h-3.5 w-3.5" />
-                </div>
-
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-slate-400" />
                 <span>
                   {new Date(b.event_date).toLocaleDateString("en-IN", {
                     weekday: "short",
@@ -313,12 +267,8 @@ function BookingCard({
                 </span>
               </div>
             )}
-
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white/[0.05]">
-                <MapPin className="h-3.5 w-3.5" />
-              </div>
-
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 text-slate-400" />
               <span className="truncate">{b.location}</span>
             </div>
           </div>
@@ -326,17 +276,23 @@ function BookingCard({
       </div>
 
       {/* Footer */}
-      {b.status === "CONFIRMED" && (
-        <div className="flex items-center justify-between border-t border-white/10 bg-white/[0.03] px-4 py-3 sm:px-5">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Clock3 className="h-3.5 w-3.5" />
-            Booking confirmed
-          </div>
-          <span className="text-xs font-semibold text-primary transition-transform group-hover:translate-x-0.5">
-            View ticket <span aria-hidden="true">-&gt;</span>
+      <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+        <div className="text-xs">
+          <span className="text-muted-foreground">Tickets: </span>
+          <span className="font-semibold text-slate-900">{b.tickets}</span>
+          <span className="text-muted-foreground ml-3">Total: </span>
+          <span className="font-semibold text-slate-900">
+            ₹{Number(b.total_amount).toLocaleString("en-IN")}
           </span>
         </div>
-      )}
-    </Link>
+
+        <Link href={`/booking/confirmation/${b.id}`}>
+          <Button variant="outline" size="sm" className="h-8 text-xs">
+            <span>Ticket Receipt</span>
+            <ArrowRight className="h-3 w-3" />
+          </Button>
+        </Link>
+      </div>
+    </div>
   );
 }

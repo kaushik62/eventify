@@ -5,17 +5,12 @@ import {
   Mail,
   Phone,
   MapPin,
-  MessageCircle,
+  Clock,
   Send,
   CheckCircle2,
-  Clock,
-  HelpCircle,
-  ArrowRight,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -33,8 +28,7 @@ export default function ContactPage() {
       return;
     }
     setLoading(true);
-    // Simulate API delay
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r, 800));
     setLoading(false);
     setSuccess(true);
   };
@@ -42,250 +36,160 @@ export default function ContactPage() {
   const contactInfo = [
     {
       icon: Mail,
-      label: "Email Support",
+      label: "Email Desk",
       value: "support@eventify.com",
-      desc: "We reply within 24 hours",
-      color: "text-primary bg-primary/10 border-primary/20",
+      desc: "Guaranteed response within 24 hours",
     },
     {
       icon: Phone,
-      label: "Phone Support",
+      label: "Phone Line",
       value: "+91 98765 43210",
-      desc: "Mon–Fri, 10 AM – 6 PM IST",
-      color: "text-accent bg-accent/10 border-accent/20",
+      desc: "Mon–Fri, 9:30 AM – 6:30 PM IST",
     },
     {
       icon: MapPin,
-      label: "Office",
+      label: "Office Location",
       value: "Mumbai, Maharashtra",
-      desc: "India — 400001",
-      color: "text-violet-400 bg-violet-500/10 border-violet-500/20",
+      desc: "Bandra Kurla Complex, India",
     },
     {
       icon: Clock,
-      label: "Response Time",
-      value: "< 24 hours",
-      desc: "For email inquiries",
-      color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      label: "Average Response",
+      value: "< 2 hours",
+      desc: "During business hours",
     },
   ];
 
   return (
-    <main className="page-surface min-h-screen">
-      {/* Background */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-24 h-96 w-96 rounded-full bg-primary/8 blur-[120px]" />
-        <div className="absolute -right-40 top-1/2 h-80 w-80 rounded-full bg-accent/6 blur-[100px]" />
-      </div>
-
-      <div className="relative mx-auto max-w-[88rem] px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-
-        {/* Header */}
+    <main className="min-h-screen bg-background py-12 sm:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
-            <MessageCircle className="h-3.5 w-3.5 text-primary" />
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
+            Get in Touch
+          </span>
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
             We&apos;re here to help
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Contact <span className="gradient-text">Eventify</span>
           </h1>
-          <p className="mt-4 text-lg leading-8 text-muted-foreground">
-            Have a question, feedback, or need support? Our team is ready to help you.
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">
+            Have questions about ticket bookings, organizer onboarding, or custom integrations? Send us a note.
           </p>
         </div>
 
-        {/* Contact info grid */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {contactInfo.map(({ icon: Icon, label, value, desc, color }) => (
-            <div key={label} className="glass card-hover p-6">
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl border ${color}`}>
-                <Icon className="h-5 w-5" />
+        {/* Contact Info Cards */}
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {contactInfo.map(({ icon: Icon, label, value, desc }) => (
+            <div
+              key={label}
+              className="rounded-xl border border-border bg-white p-5 shadow-card"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 mb-3">
+                <Icon className="h-4.5 w-4.5" />
               </div>
-              <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {label}
               </p>
-              <p className="mt-1.5 font-semibold">{value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{desc}</p>
+              <p className="mt-1 text-sm font-bold text-slate-900">{value}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
             </div>
           ))}
         </div>
 
-        {/* Main content: form + FAQ */}
-        <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_360px]">
-
-          {/* Contact form */}
-          <div className="premium-panel p-7 sm:p-9">
-            {success ? (
-              <div className="flex flex-col items-center py-12 text-center">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl" />
-                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10 text-emerald-300">
-                    <CheckCircle2 className="h-10 w-10" />
-                  </div>
-                </div>
-                <h2 className="text-2xl font-bold">Message Sent!</h2>
-                <p className="mt-3 max-w-sm text-muted-foreground">
-                  Thank you for reaching out, {form.name}. We&apos;ve received your message and will
-                  reply to <strong className="text-foreground">{form.email}</strong> within 24 hours.
-                </p>
-                <Button
-                  className="mt-8 rounded-xl"
-                  onClick={() => { setSuccess(false); setForm({ name: "", email: "", subject: "", message: "" }); }}
-                >
-                  Send another message
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="mb-7">
-                  <h2 className="text-2xl font-bold tracking-tight">Send us a message</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Fill in the form and we&apos;ll get back to you as soon as possible.
-                  </p>
-                </div>
-
-                {error && (
-                  <div role="alert" className="mb-5 rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300">
-                    {error}
-                  </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label htmlFor="contact-name" className="mb-2 block text-sm font-semibold">
-                        Full name <span className="text-red-400">*</span>
-                      </label>
-                      <Input
-                        id="contact-name"
-                        required
-                        placeholder="Your full name"
-                        value={form.name}
-                        onChange={(e) => update("name", e.target.value)}
-                        className="h-11 rounded-xl"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="contact-email" className="mb-2 block text-sm font-semibold">
-                        Email address <span className="text-red-400">*</span>
-                      </label>
-                      <Input
-                        id="contact-email"
-                        type="email"
-                        required
-                        placeholder="you@example.com"
-                        value={form.email}
-                        onChange={(e) => update("email", e.target.value)}
-                        className="h-11 rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact-subject" className="mb-2 block text-sm font-semibold">
-                      Subject
-                    </label>
-                    <Input
-                      id="contact-subject"
-                      placeholder="What is this about?"
-                      value={form.subject}
-                      onChange={(e) => update("subject", e.target.value)}
-                      className="h-11 rounded-xl"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact-message" className="mb-2 block text-sm font-semibold">
-                      Message <span className="text-red-400">*</span>
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      required
-                      rows={6}
-                      placeholder="Tell us how we can help you..."
-                      value={form.message}
-                      onChange={(e) => update("message", e.target.value)}
-                      className="glass-input w-full p-3.5 text-sm"
-                    />
-                    <p className="mt-1.5 text-right text-xs text-muted-foreground">
-                      {form.message.length} / 1000 characters
-                    </p>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    size="lg"
-                    disabled={loading}
-                    className="h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Send Message
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </>
-            )}
-          </div>
-
-          {/* Sidebar: Quick help */}
-          <div className="space-y-5">
-            <div className="glass p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <HelpCircle className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold">Quick Help</h3>
-              </div>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>Before contacting us, check our FAQ — most questions are answered there.</p>
-              </div>
-              <Link href="/faq">
-                <Button variant="outline" size="sm" className="mt-4 w-full rounded-xl gap-2">
-                  View FAQ
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
-            </div>
-
-            <div className="glass p-6">
-              <h3 className="mb-4 font-semibold">Common Topics</h3>
-              <ul className="space-y-2 text-sm">
-                {[
-                  "Booking a ticket",
-                  "Payment issues",
-                  "Event cancellations",
-                  "Organizer accounts",
-                  "Technical problems",
-                  "Refund requests",
-                ].map((topic) => (
-                  <li key={topic}>
-                    <Link
-                      href="/faq"
-                      className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      <ArrowRight className="h-3.5 w-3.5 text-primary" />
-                      {topic}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
-              <p className="text-sm font-semibold">Response Guarantee</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                We commit to responding to all inquiries within{" "}
-                <strong className="text-foreground">24 business hours</strong>. Urgent issues
-                are prioritized.
+        {/* Form Container */}
+        <div className="mt-10 max-w-2xl mx-auto rounded-xl border border-border bg-white p-6 sm:p-8 shadow-card">
+          {success ? (
+            <div className="text-center py-8 space-y-3">
+              <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
+              <h3 className="text-lg font-bold text-slate-900">
+                Message Sent Successfully
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                Thank you for contacting Eventify. Our support team has received your message and will respond to {form.email} shortly.
               </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSuccess(false);
+                  setForm({ name: "", email: "", subject: "", message: "" });
+                }}
+              >
+                Send Another Message
+              </Button>
             </div>
-          </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                    Your Name *
+                  </label>
+                  <Input
+                    required
+                    placeholder="Kaushik Sharma"
+                    value={form.name}
+                    onChange={(e) => update("name", e.target.value)}
+                    className="h-10 text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                    Email Address *
+                  </label>
+                  <Input
+                    required
+                    type="email"
+                    placeholder="you@example.com"
+                    value={form.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    className="h-10 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Subject
+                </label>
+                <Input
+                  placeholder="How can we help?"
+                  value={form.subject}
+                  onChange={(e) => update("subject", e.target.value)}
+                  className="h-10 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Message *
+                </label>
+                <textarea
+                  required
+                  rows={5}
+                  placeholder="Tell us more about your question or inquiry..."
+                  value={form.message}
+                  onChange={(e) => update("message", e.target.value)}
+                  className="flex w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-xs text-foreground shadow-subtle outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                size="lg"
+                disabled={loading}
+                className="w-full sm:w-auto h-10 text-xs"
+              >
+                <Send className="h-3.5 w-3.5 mr-1.5" />
+                {loading ? "Sending Message..." : "Submit Message"}
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     </main>

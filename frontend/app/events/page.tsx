@@ -6,22 +6,23 @@ import {
   Search,
   SlidersHorizontal,
   X,
-  Sparkles,
   MapPin,
   Tag,
   ArrowDownUp,
+  Sparkles,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { EventCard } from "@/components/EventCard";
 import api from "@/lib/api";
 import { EventItem } from "@/lib/types";
 
 const CATEGORIES = [
   "Music",
-  "Art",
   "Technology",
+  "Art",
   "Sports",
   "Conferences",
   "Food",
@@ -61,7 +62,7 @@ function EventsContent() {
       setEvents(res.data.data.events);
     } catch {
       setEvents([]);
-      setError("We could not load events right now. Check your connection and try again.");
+      setError("Unable to load events at this moment. Please check your connection and retry.");
     } finally {
       setLoading(false);
     }
@@ -80,357 +81,256 @@ function EventsContent() {
     setSort("date_asc");
   };
 
-  const hasFilters =
-    search || category || location || minPrice || maxPrice;
+  const hasFilters = search || category || location || minPrice || maxPrice;
 
   return (
-    <main className="page-surface min-h-screen">
-      <div className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-
-        {/* Hero */}
-        <section className="premium-panel relative overflow-hidden">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-violet-500/10 blur-3xl" />
-
-          <div className="relative px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-
-            <div className="mt-5 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-              <div>
-                <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  Find your next{" "}
-                  <span className="text-primary">plan.</span>
-                </h1>
-
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-                  Discover concerts, conferences, sports, food experiences,
-                  and more happening around you.
-                </p>
-              </div>
-
-              <div className="glass flex w-fit items-center gap-2 px-5 py-3.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                  <Tag className="h-4 w-4 text-primary" />
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    Available now
-                  </p>
-                  <p className="font-semibold">
-                    {events.length} events
-                  </p>
-                </div>
-              </div>
+    <main className="min-h-screen bg-background py-8 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header Strip */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-border pb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Sparkles className="h-3.5 w-3.5" />
+              Event Marketplace
             </div>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Discover Live Experiences
+            </h1>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Browse, filter, and reserve verified tickets for upcoming events.
+            </p>
           </div>
-        </section>
 
-        {/* Category shortcuts */}
-        <div className="mt-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <CategoryButton
-            label="All"
-            active={!category}
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-subtle">
+              <span className="font-semibold text-slate-900 mr-1">
+                {events.length}
+              </span>{" "}
+              events found
+            </span>
+          </div>
+        </div>
+
+        {/* Quick Category Filter Chips */}
+        <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            type="button"
             onClick={() => setCategory("")}
-          />
-
+            className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+              !category
+                ? "border-primary bg-primary text-white shadow-subtle"
+                : "border-border bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            }`}
+          >
+            All Categories
+          </button>
           {CATEGORIES.map((item) => (
-            <CategoryButton
+            <button
               key={item}
-              label={item}
-              active={category === item}
-              onClick={() => setCategory(item)}
-            />
+              type="button"
+              onClick={() => setCategory(category === item ? "" : item)}
+              className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                category === item
+                  ? "border-primary bg-primary text-white shadow-subtle"
+                  : "border-border bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              {item}
+            </button>
           ))}
         </div>
 
-        {/* Search & filters */}
+        {/* Detailed Search & Filter Control Bar */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             fetchEvents();
           }}
-          className="glass mt-5 p-5 sm:p-6"
+          className="mt-5 rounded-xl border border-border bg-white p-4 shadow-card sm:p-5"
         >
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 text-primary" />
-
-            <div>
-              <p className="text-sm font-semibold">
-                Search & filter events
-              </p>
-              <p className="hidden text-xs text-muted-foreground sm:block">
-                Find the right event using the filters below
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-
-            {/* Search */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+            {/* Search Input */}
             <div className="relative lg:col-span-2">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search events..."
-                className="h-11 rounded-xl pl-9"
+                placeholder="Search event name or artist..."
+                className="pl-9 h-10"
               />
             </div>
 
-            {/* Category */}
+            {/* Location Input */}
             <div className="relative">
-              <Tag className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="glass-input h-11 w-full appearance-none pl-9 pr-3 text-sm"
-              >
-                <option value="">All categories</option>
-
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Location */}
-            <div className="relative">
-              <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
+              <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Location"
-                className="h-11 rounded-xl pl-9"
+                placeholder="City / Venue"
+                className="pl-9 h-10"
               />
             </div>
 
-            {/* Min price */}
-            <Input
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="Min price"
-              type="number"
-              min="0"
-              className="h-11 rounded-xl"
-            />
+            {/* Price Inputs */}
+            <div className="flex gap-2">
+              <Input
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                placeholder="Min ₹"
+                type="number"
+                min="0"
+                className="h-10 text-xs"
+              />
+              <Input
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                placeholder="Max ₹"
+                type="number"
+                min="0"
+                className="h-10 text-xs"
+              />
+            </div>
 
-            {/* Max price */}
-            <Input
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="Max price"
-              type="number"
-              min="0"
-              className="h-11 rounded-xl"
-            />
-
-            {/* Sort */}
-            <div className="relative sm:col-span-2 lg:col-span-3">
-              <ArrowDownUp className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <ArrowDownUp className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="glass-input h-11 w-full appearance-none pl-9 pr-3 text-sm"
+                className="flex h-10 w-full appearance-none rounded-lg border border-border bg-white pl-9 pr-3 text-xs text-foreground shadow-subtle outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
-                <option value="date_asc">
-                  Date: Soonest first
-                </option>
-
-                <option value="date_desc">
-                  Date: Latest first
-                </option>
-
-                <option value="price_asc">
-                  Price: Low to high
-                </option>
-
-                <option value="price_desc">
-                  Price: High to low
-                </option>
+                <option value="date_asc">Date: Soonest first</option>
+                <option value="date_desc">Date: Latest first</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
               </select>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2 sm:col-span-2 lg:col-span-3 lg:justify-end">
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Button type="submit" size="md" className="flex-1 h-10">
+                <Search className="h-3.5 w-3.5" />
+                <span>Apply</span>
+              </Button>
               {hasFilters && (
                 <Button
                   type="button"
                   variant="outline"
+                  size="md"
                   onClick={clearFilters}
-                  className="h-11 rounded-xl"
+                  className="h-10 px-3 text-xs"
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Clear
+                  <X className="h-3.5 w-3.5" />
+                  <span>Reset</span>
                 </Button>
               )}
-
-              <Button
-                type="submit"
-                className="h-11 flex-1 rounded-xl sm:flex-none"
-              >
-                <Search className="mr-2 h-4 w-4" />
-                Apply Filters
-              </Button>
             </div>
           </div>
         </form>
 
-        {/* Results header */}
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">
-              Explore events
-            </h2>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              {loading
-                ? "Finding events for you..."
-                : events.length > 0
-                ? `${events.length} ${
-                    events.length === 1 ? "event" : "events"
-                  } available`
-                : "No matching events"}
-            </p>
+        {/* Active Filter Pills */}
+        {hasFilters && !loading && (
+          <div className="mt-4 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="font-medium text-slate-700 mr-1">Active filters:</span>
+            {search && (
+              <Badge variant="secondary" className="gap-1">
+                Keyword: {search}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setSearch("")} />
+              </Badge>
+            )}
+            {category && (
+              <Badge variant="secondary" className="gap-1">
+                Category: {category}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setCategory("")} />
+              </Badge>
+            )}
+            {location && (
+              <Badge variant="secondary" className="gap-1">
+                Location: {location}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setLocation("")} />
+              </Badge>
+            )}
+            {minPrice && (
+              <Badge variant="secondary" className="gap-1">
+                Min: ₹{minPrice}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setMinPrice("")} />
+              </Badge>
+            )}
+            {maxPrice && (
+              <Badge variant="secondary" className="gap-1">
+                Max: ₹{maxPrice}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setMaxPrice("")} />
+              </Badge>
+            )}
           </div>
+        )}
 
-          {hasFilters && !loading && (
-            <div className="flex flex-wrap gap-2">
-              {search && <FilterPill label={`Search: ${search}`} />}
-              {category && <FilterPill label={category} />}
-              {location && <FilterPill label={location} />}
-              {minPrice && (
-                <FilterPill label={`Min ₹${minPrice}`} />
-              )}
-              {maxPrice && (
-                <FilterPill label={`Max ₹${maxPrice}`} />
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Results */}
-        <section className="mt-5">
+        {/* Event Grid Section */}
+        <div className="mt-8">
           {loading ? (
-            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <EventSkeleton key={i} />
-              ))}
-            </div>
-          ) : error ? (
-            <div className="rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-6 py-16 text-center">
-              <h3 className="font-semibold">Unable to load events</h3>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{error}</p>
-              <Button className="mt-5 rounded-xl" onClick={fetchEvents}>Try again</Button>
-            </div>
-          ) : events.length === 0 ? (
-            <EmptyState onClear={clearFilters} hasFilters={!!hasFilters} />
-          ) : (
-            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 xl:grid-cols-3">
-              {events.map((event, index) => (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
                 <div
-                  key={event.id}
-                  className={`reveal-up reveal-delay-${Math.min(
-                    (index % 3) + 1,
-                    3
-                  )}`}
+                  key={i}
+                  className="flex flex-col rounded-xl border border-border bg-white shadow-card overflow-hidden h-84 animate-pulse"
                 >
-                  <EventCard event={event} />
+                  <div className="aspect-[16/10] bg-slate-100" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-3 w-28 rounded bg-slate-100" />
+                    <div className="h-4 w-3/4 rounded bg-slate-100" />
+                    <div className="h-3 w-full rounded bg-slate-100" />
+                    <div className="pt-4 flex justify-between">
+                      <div className="h-4 w-16 rounded bg-slate-100" />
+                      <div className="h-6 w-16 rounded bg-slate-100" />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
+          ) : error ? (
+            <div className="rounded-xl border border-dashed border-red-300 bg-red-50/50 p-12 text-center">
+              <p className="text-sm font-semibold text-red-800">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={fetchEvents}
+              >
+                Retry
+              </Button>
+            </div>
+          ) : events.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border bg-white p-12 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                <Search className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 text-base font-semibold text-slate-900">
+                No matching events found
+              </h3>
+              <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
+                We couldn&apos;t find any events that match your current search criteria. Try loosening your filters or browsing all categories.
+              </p>
+              {hasFilters && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-5"
+                  onClick={clearFilters}
+                >
+                  Clear All Filters
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
           )}
-        </section>
+        </div>
       </div>
     </main>
-  );
-}
-
-function CategoryButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-        active
-          ? "border-primary/30 bg-primary text-primary-foreground shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.5)]"
-          : "border-white/10 bg-white/[0.04] text-muted-foreground backdrop-blur-sm hover:border-primary/30 hover:bg-white/[0.07] hover:text-foreground"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function FilterPill({ label }: { label: string }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur-sm">
-      {label}
-    </span>
-  );
-}
-
-function EventSkeleton() {
-  return (
-    <div className="glass overflow-hidden">
-      <div className="h-48 animate-pulse bg-white/[0.04]" />
-
-      <div className="space-y-3 p-6">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-white/[0.06]" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-white/[0.06]" />
-        <div className="h-3 w-2/3 animate-pulse rounded bg-white/[0.06]" />
-        <div className="mt-4 h-8 w-1/3 animate-pulse rounded bg-white/[0.06]" />
-      </div>
-    </div>
-  );
-}
-
-function EmptyState({
-  onClear,
-  hasFilters,
-}: {
-  onClear: () => void;
-  hasFilters: boolean;
-}) {
-  return (
-    <div className="glass rounded-3xl border-dashed px-6 py-20 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05]">
-        <Search className="h-6 w-6 text-muted-foreground" />
-      </div>
-
-      <h3 className="mt-5 text-lg font-semibold">
-        No events found
-      </h3>
-
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-        We couldn&apos;t find any events matching your current search.
-        Try changing your filters or searching for something else.
-      </p>
-
-      {hasFilters && (
-        <Button
-          variant="outline"
-          className="mt-6 rounded-xl"
-          onClick={onClear}
-        >
-          <X className="mr-2 h-4 w-4" />
-          Clear all filters
-        </Button>
-      )}
-    </div>
   );
 }
 
@@ -438,13 +338,9 @@ export default function EventsPage() {
   return (
     <Suspense
       fallback={
-        <main className="page-surface min-h-screen">
-          <div className="mx-auto max-w-[88rem] px-4 py-24 text-center">
-            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <p className="mt-4 text-sm text-muted-foreground">
-              Loading events…
-            </p>
-          </div>
+        <main className="min-h-screen bg-background py-16 text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="mt-3 text-xs text-muted-foreground">Loading marketplace...</p>
         </main>
       }
     >

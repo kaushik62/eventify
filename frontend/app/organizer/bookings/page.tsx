@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import {
   CheckCircle2,
-  Clock3,
   IndianRupee,
   Mail,
   Ticket,
   Users,
+  Search,
+  CalendarDays,
+  Calendar,
 } from "lucide-react";
 import api from "@/lib/api";
 import { EventItem } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 interface BookingRow {
   id: number;
@@ -21,26 +25,8 @@ interface BookingRow {
   status: string;
 }
 
-function getStatusStyles(status: string) {
-  switch (status.toUpperCase()) {
-    case "CONFIRMED":
-      return "bg-emerald-400/10 text-emerald-300 ring-1 ring-inset ring-emerald-400/20";
-
-    case "PENDING":
-      return "bg-amber-400/10 text-amber-300 ring-1 ring-inset ring-amber-400/20";
-
-    case "CANCELLED":
-      return "bg-red-400/10 text-red-300 ring-1 ring-inset ring-red-400/20";
-
-    case "FAILED":
-      return "bg-white/[0.05] text-white/60 ring-1 ring-inset ring-white/10";
-
-    default:
-      return "bg-muted text-muted-foreground";
-  }
-}
-
 function getInitials(name: string) {
+  if (!name) return "A";
   return name
     .split(" ")
     .map((part) => part[0])
@@ -55,11 +41,18 @@ export default function OrganizerBookingsPage() {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     api
       .get("/events/organizer/my-events")
-      .then((res) => setEvents(res.data.data))
+      .then((res) => {
+        const evts = res.data.data;
+        setEvents(evts);
+        if (evts.length > 0) {
+          setSelectedEvent((current) => current ?? evts[0].id);
+        }
+      })
       .finally(() => setLoadingEvents(false));
   }, []);
 
@@ -80,6 +73,15 @@ export default function OrganizerBookingsPage() {
     (event) => event.id === selectedEvent
   );
 
+  const filteredBookings = bookings.filter((b) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      b.user_name.toLowerCase().includes(q) ||
+      b.user_email.toLowerCase().includes(q)
+    );
+  });
+
   const totalTickets = bookings.reduce(
     (sum, booking) => sum + Number(booking.tickets),
     0
@@ -94,388 +96,216 @@ export default function OrganizerBookingsPage() {
     (booking) => booking.status.toUpperCase() === "CONFIRMED"
   ).length;
 
-  const formatAmount = (amount: number) =>
-    `₹${amount.toLocaleString("en-IN")}`;
+  const getStatusBadge = (status: string) => {
+    switch (status.toUpperCase()) {
+      case "CONFIRMED":
+        return <Badge variant="success">Confirmed</Badge>;
+      case "PENDING":
+        return <Badge variant="warning">Pending</Badge>;
+      case "CANCELLED":
+      case "FAILED":
+        return <Badge variant="destructive">Cancelled</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
 
   return (
-    <div className="page-surface min-h-screen">
-      <div className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div>
-          <p className="mb-2 text-sm font-medium text-primary">
-            Organizer dashboard
-          </p>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="border-b border-border pb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          Attendee Bookings
+        </h1>
+        <p className="mt-1 text-xs text-muted-foreground">
+          View live reservations, attendee contact details, and payment verification for your events.
+        </p>
+      </div>
 
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Bookings
-          </h1>
+      {/* Event Selector Filter Strip */}
+      <div className="rounded-xl border border-border bg-white p-5 shadow-card">
+        <label className="block text-xs font-semibold text-slate-900 mb-2">
+          Select Event to Inspect
+        </label>
+        <select
+          value={selectedEvent || ""}
+          onChange={(e) =>
+            setSelectedEvent(Number(e.target.value) || null)
+          }
+          className="flex h-10 w-full max-w-xl rounded-lg border border-border bg-white px-3 text-xs text-foreground shadow-subtle outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="">
+            {loadingEvents ? "Loading events..." : "Choose an event..."}
+          </option>
+          {events.map((event) => (
+            <option key={event.id} value={event.id}>
+              {event.name} — {new Date(event.event_date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Track attendees, ticket sales, and booking activity for your
-            events.
-          </p>
-        </div>
-
-        {/* Event selector */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Ticket className="h-5 w-5" />
+      {selectedEvent && selectedEventData && (
+        <div className="space-y-6">
+          {/* Selected Event Context Card */}
+          <div className="rounded-xl border border-border bg-white p-5 shadow-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                Active Listing
+              </span>
+              <h2 className="mt-0.5 text-lg font-bold text-slate-900">
+                {selectedEventData.name}
+              </h2>
+              <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <CalendarDays className="h-3.5 w-3.5 text-slate-400" />
+                  {new Date(selectedEventData.event_date).toLocaleDateString("en-IN", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+                <span>•</span>
+                <span>{selectedEventData.available_seats} of {selectedEventData.total_seats} tickets remaining</span>
+              </div>
             </div>
 
-            <div>
-              <h2 className="font-semibold">Select an event</h2>
-              <p className="text-xs text-muted-foreground">
-                Choose an event to view its bookings.
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Unit Price:</span>
+              <span className="text-sm font-bold text-slate-900">
+                ₹{Number(selectedEventData.price).toLocaleString("en-IN")}
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Metrics */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-border bg-white p-4 shadow-card">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Total Orders
+              </span>
+              <p className="mt-2 text-2xl font-black text-slate-900">
+                {loadingBookings ? "—" : bookings.length}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-white p-4 shadow-card">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Confirmed
+              </span>
+              <p className="mt-2 text-2xl font-black text-emerald-600">
+                {loadingBookings ? "—" : confirmedBookings}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-white p-4 shadow-card">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Tickets Sold
+              </span>
+              <p className="mt-2 text-2xl font-black text-slate-900">
+                {loadingBookings ? "—" : totalTickets.toLocaleString("en-IN")}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-white p-4 shadow-card">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Event Gross
+              </span>
+              <p className="mt-2 text-2xl font-black text-slate-900">
+                {loadingBookings ? "—" : `₹${totalRevenue.toLocaleString("en-IN")}`}
               </p>
             </div>
           </div>
 
-          <select
-            onChange={(e) =>
-              setSelectedEvent(Number(e.target.value) || null)
-            }
-            className="h-12 w-full max-w-xl rounded-xl border border-border bg-background px-4 text-sm font-medium outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-            defaultValue=""
-          >
-            <option value="">
-              {loadingEvents
-                ? "Loading events..."
-                : events.length === 0
-                  ? "No events available"
-                  : "Select an event"}
-            </option>
-
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>
-                {event.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Selected event */}
-        {selectedEvent && selectedEventData && (
-          <>
-            {/* Event summary */}
-            <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-
-              <div className="relative">
-                <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                  Selected event
+          {/* Attendee Roster Table */}
+          <div className="rounded-xl border border-border bg-white shadow-card overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border p-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Attendee Roster
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Showing {filteredBookings.length} of {bookings.length} reservations
                 </p>
+              </div>
 
-                <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                  {selectedEventData.name}
-                </h2>
-
-                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                  <span>
-                    {new Date(
-                      selectedEventData.event_date
-                    ).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </span>
-
-                  <span>
-                    {selectedEventData.available_seats} seats available
-                  </span>
-                </div>
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Filter by name or email..."
+                  className="pl-8 h-8 text-xs"
+                />
               </div>
             </div>
 
-            {/* Booking stats */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total bookings
-                    </p>
-
-                    <p className="mt-2 text-2xl font-bold">
-                      {loadingBookings ? "—" : bookings.length}
-                    </p>
-                  </div>
-
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Users className="h-5 w-5" />
-                  </div>
-                </div>
+            {loadingBookings ? (
+              <div className="p-8 text-center">
+                <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <p className="mt-2 text-xs text-muted-foreground">Loading attendee data...</p>
               </div>
-
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Confirmed
-                    </p>
-
-                    <p className="mt-2 text-2xl font-bold">
-                      {loadingBookings ? "—" : confirmedBookings}
-                    </p>
-                  </div>
-
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
-                </div>
+            ) : filteredBookings.length === 0 ? (
+              <div className="p-12 text-center">
+                <Users className="mx-auto h-8 w-8 text-slate-300" />
+                <p className="mt-2 text-xs font-semibold text-slate-800">
+                  {searchQuery ? "No matching attendees" : "No attendees booked yet"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {searchQuery ? "Try clearing your search query." : "Attendees will show here as tickets are reserved."}
+                </p>
               </div>
-
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Tickets sold
-                    </p>
-
-                    <p className="mt-2 text-2xl font-bold">
-                      {loadingBookings
-                        ? "—"
-                        : totalTickets.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-                    <Ticket className="h-5 w-5" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Revenue
-                    </p>
-
-                    <p className="mt-2 text-2xl font-bold">
-                      {loadingBookings
-                        ? "—"
-                        : formatAmount(totalRevenue)}
-                    </p>
-                  </div>
-
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
-                    <IndianRupee className="h-5 w-5" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bookings table */}
-            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              <div className="flex flex-col gap-2 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    Attendees
-                  </h2>
-
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    View everyone who booked this event.
-                  </p>
-                </div>
-
-                {!loadingBookings && bookings.length > 0 && (
-                  <span className="w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                    {bookings.length}{" "}
-                    {bookings.length === 1
-                      ? "booking"
-                      : "bookings"}
-                  </span>
-                )}
-              </div>
-
-              {loadingBookings ? (
-                <div className="space-y-4 p-5">
-                  {[1, 2, 3, 4, 5].map((item) => (
-                    <div
-                      key={item}
-                      className="h-16 animate-pulse rounded-xl bg-muted"
-                    />
-                  ))}
-                </div>
-              ) : bookings.length === 0 ? (
-                <div className="flex min-h-[300px] flex-col items-center justify-center px-6 text-center">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-                    <Ticket className="h-6 w-6 text-muted-foreground" />
-                  </div>
-
-                  <h3 className="text-lg font-semibold">
-                    No bookings yet
-                  </h3>
-
-                  <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                    Bookings for this event will appear here once attendees
-                    purchase tickets.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {/* Desktop table */}
-                  <div className="hidden overflow-x-auto md:block">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border bg-muted/40 text-left">
-                          <th className="px-5 py-4 font-medium text-muted-foreground">
-                            Attendee
-                          </th>
-
-                          <th className="px-5 py-4 font-medium text-muted-foreground">
-                            Email
-                          </th>
-
-                          <th className="px-5 py-4 font-medium text-muted-foreground">
-                            Tickets
-                          </th>
-
-                          <th className="px-5 py-4 font-medium text-muted-foreground">
-                            Amount
-                          </th>
-
-                          <th className="px-5 py-4 font-medium text-muted-foreground">
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {bookings.map((booking) => (
-                          <tr
-                            key={booking.id}
-                            className="border-b border-border transition-colors last:border-0 hover:bg-muted/30"
-                          >
-                            <td className="px-5 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                                  {getInitials(booking.user_name)}
-                                </div>
-
-                                <span className="font-semibold">
-                                  {booking.user_name}
-                                </span>
-                              </div>
-                            </td>
-
-                            <td className="px-5 py-4">
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <Mail className="h-4 w-4" />
-                                <span>{booking.user_email}</span>
-                              </div>
-                            </td>
-
-                            <td className="px-5 py-4 font-semibold">
-                              {booking.tickets}
-                            </td>
-
-                            <td className="px-5 py-4 font-semibold">
-                              ₹
-                              {Number(
-                                booking.total_amount
-                              ).toLocaleString("en-IN")}
-                            </td>
-
-                            <td className="px-5 py-4">
-                              <span
-                                className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyles(
-                                  booking.status
-                                )}`}
-                              >
-                                {booking.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile cards */}
-                  <div className="divide-y divide-border md:hidden">
-                    {bookings.map((booking) => (
-                      <div key={booking.id} className="p-5">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex min-w-0 items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                              {getInitials(booking.user_name)}
-                            </div>
-
-                            <div className="min-w-0">
-                              <p className="truncate font-semibold">
-                                {booking.user_name}
-                              </p>
-
-                              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
-                                <Mail className="h-3 w-3 shrink-0" />
-                                {booking.user_email}
-                              </p>
-                            </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="saas-table">
+                  <thead>
+                    <tr>
+                      <th>Attendee</th>
+                      <th>Email Address</th>
+                      <th>Tickets</th>
+                      <th>Total Paid</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredBookings.map((b) => (
+                      <tr key={b.id}>
+                        <td>
+                          <div className="flex items-center gap-2.5">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-[10px] font-bold text-indigo-700">
+                              {getInitials(b.user_name)}
+                            </span>
+                            <span className="font-semibold text-slate-900">
+                              {b.user_name}
+                            </span>
                           </div>
-
-                          <span
-                            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyles(
-                              booking.status
-                            )}`}
-                          >
-                            {booking.status}
+                        </td>
+                        <td>
+                          <span className="text-xs text-slate-600">
+                            {b.user_email}
                           </span>
-                        </div>
-
-                        <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-muted/40 p-3">
-                          <div>
-                            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                              Tickets
-                            </p>
-
-                            <p className="mt-1 font-semibold">
-                              {booking.tickets}
-                            </p>
-                          </div>
-
-                          <div>
-                            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                              Amount
-                            </p>
-
-                            <p className="mt-1 font-semibold">
-                              ₹
-                              {Number(
-                                booking.total_amount
-                              ).toLocaleString("en-IN")}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                        </td>
+                        <td>
+                          <span className="font-semibold text-slate-900">
+                            {b.tickets}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="font-semibold text-slate-900">
+                            ₹{Number(b.total_amount).toLocaleString("en-IN")}
+                          </span>
+                        </td>
+                        <td>{getStatusBadge(b.status)}</td>
+                      </tr>
                     ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* No event selected */}
-        {!selectedEvent && (
-          <div className="rounded-3xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Ticket className="h-6 w-6" />
-            </div>
-
-            <h2 className="text-lg font-semibold">
-              Select an event to continue
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Choose one of your events above to view attendee bookings,
-              ticket sales, and revenue.
-            </p>
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

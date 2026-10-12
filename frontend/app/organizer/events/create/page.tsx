@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, MapPin, Sparkles, UploadCloud } from "lucide-react";
+import { ImagePlus, MapPin, UploadCloud, CheckCircle2, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 
 const CATEGORIES = [
   "Music",
-  "Art",
   "Technology",
+  "Art",
   "Sports",
   "Conferences",
   "Food",
@@ -53,7 +54,7 @@ export default function CreateEventPage() {
     const fileType = imageFile.type || "image/jpeg";
 
     if (imageFile.size > 10 * 1024 * 1024) {
-      throw new Error("Image file size exceeds 10 MB limit.");
+      throw new Error("Image file size exceeds the 10 MB limit.");
     }
 
     const presignedRes = await api.post("/uploads/presigned-url", {
@@ -106,7 +107,7 @@ export default function CreateEventPage() {
       const message =
         err?.message ||
         err?.response?.data?.message ||
-        "Failed to create event";
+        "Failed to create event. Please check all fields.";
       setError(message);
     } finally {
       setSubmitting(false);
@@ -114,172 +115,205 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="max-w-5xl">
-      <div className="mb-8 flex items-start justify-between gap-6">
-        <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Bring your event to life
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">Create an event</h1>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Give your audience a clear reason to show up. You can edit these
-            details later.
-          </p>
-        </div>
-        <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
-          <MapPin className="h-4 w-4 text-primary" /> Your event, beautifully
-          presented
-        </div>
+    <div className="max-w-5xl space-y-6">
+      {/* Back button & Title */}
+      <div>
+        <Link
+          href="/organizer/events"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-2"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Back to My Events</span>
+        </Link>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          Publish New Event Listing
+        </h1>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Fill in your event details, configure ticket quantity, and upload promotional media.
+        </p>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid gap-6 lg:grid-cols-[1fr_340px]"
-      >
-        <div className="soft-panel space-y-5 p-5 sm:p-7">
-          {error && (
-            <p className="rounded-lg border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-300">
-              {error}
-            </p>
-          )}
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-12">
+        {/* Left: Main Form Fields */}
+        <div className="lg:col-span-8 space-y-6">
+          <div className="rounded-xl border border-border bg-white p-6 shadow-card space-y-5">
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                {error}
+              </div>
+            )}
 
-          <div>
-            <label className="mb-1.5 block text-sm font-medium">
-              Event name
-            </label>
-            <Input
-              required
-              value={form.name}
-              onChange={(e) => update("name", e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-sm font-medium">
-              Description
-            </label>
-            <textarea
-              required
-              minLength={10}
-              rows={4}
-              value={form.description}
-              onChange={(e) => update("description", e.target.value)}
-              className="glass-input w-full p-3 text-sm"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Event Name */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                Category
-              </label>
-              <select
-                value={form.category}
-                onChange={(e) => update("category", e.target.value)}
-                className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm"
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                Location
+              <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                Event Title *
               </label>
               <Input
                 required
-                value={form.location}
-                onChange={(e) => update("location", e.target.value)}
+                placeholder="e.g. Annual Tech Leadership Summit 2026"
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+                className="h-10 text-sm"
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Description */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Date</label>
-              <Input
-                required
-                type="date"
-                value={form.eventDate}
-                onChange={(e) => update("eventDate", e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">Time</label>
-              <Input
-                required
-                type="time"
-                value={form.eventTime}
-                onChange={(e) => update("eventTime", e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                Ticket price (₹)
+              <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                Event Overview & Description *
               </label>
-              <Input
+              <textarea
                 required
-                type="number"
-                min={0}
-                value={form.price}
-                onChange={(e) => update("price", e.target.value)}
+                minLength={10}
+                rows={5}
+                placeholder="Describe what attendees can expect, speakers, schedule, and experience details..."
+                value={form.description}
+                onChange={(e) => update("description", e.target.value)}
+                className="flex w-full rounded-lg border border-border bg-white px-3.5 py-2.5 text-xs text-foreground shadow-subtle outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                Total seats
-              </label>
-              <Input
-                required
-                type="number"
-                min={1}
-                value={form.totalSeats}
-                onChange={(e) => update("totalSeats", e.target.value)}
-              />
+
+            {/* Category & Location */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Category *
+                </label>
+                <select
+                  value={form.category}
+                  onChange={(e) => update("category", e.target.value)}
+                  className="flex h-10 w-full rounded-lg border border-border bg-white px-3 text-xs text-foreground shadow-subtle outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Venue / Location *
+                </label>
+                <Input
+                  required
+                  placeholder="e.g. Jio Convention Centre, Mumbai"
+                  value={form.location}
+                  onChange={(e) => update("location", e.target.value)}
+                  className="h-10 text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Date & Time */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Event Date *
+                </label>
+                <Input
+                  required
+                  type="date"
+                  value={form.eventDate}
+                  onChange={(e) => update("eventDate", e.target.value)}
+                  className="h-10 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Start Time *
+                </label>
+                <Input
+                  required
+                  type="time"
+                  value={form.eventTime}
+                  onChange={(e) => update("eventTime", e.target.value)}
+                  className="h-10 text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Pricing & Capacity */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 border-t border-border pt-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Ticket Price (₹ INR) *
+                </label>
+                <Input
+                  required
+                  type="number"
+                  min={0}
+                  placeholder="e.g. 999"
+                  value={form.price}
+                  onChange={(e) => update("price", e.target.value)}
+                  className="h-10 text-xs"
+                />
+                <span className="text-[10px] text-muted-foreground mt-1 block">
+                  Set 0 for free admission.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  Total Ticket Capacity *
+                </label>
+                <Input
+                  required
+                  type="number"
+                  min={1}
+                  placeholder="e.g. 150"
+                  value={form.totalSeats}
+                  onChange={(e) => update("totalSeats", e.target.value)}
+                  className="h-10 text-xs"
+                />
+                <span className="text-[10px] text-muted-foreground mt-1 block">
+                  Maximum tickets bookable for this event.
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={submitting}>
+                {submitting ? "Publishing Listing..." : "Publish Event"}
+              </Button>
             </div>
           </div>
-
-          <Button type="submit" size="lg" disabled={submitting}>
-            {submitting ? "Creating…" : "Create Event"}
-          </Button>
         </div>
 
-        <aside className="space-y-4">
-          <div className="soft-panel overflow-hidden p-3">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-muted">
+        {/* Right Sidebar: Cover Image & Quality Checklist */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* Cover Image Upload Card */}
+          <div className="rounded-xl border border-border bg-white p-5 shadow-card">
+            <label className="block text-xs font-bold text-slate-900 mb-2">
+              Event Cover Photo
+            </label>
+
+            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-dashed border-border bg-slate-50 flex items-center justify-center">
               {imagePreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={imagePreview}
-                  alt="Event preview"
+                  alt="Event cover preview"
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="px-8 text-center text-muted-foreground">
-                  <ImagePlus className="mx-auto mb-3 h-9 w-9 text-primary/70" />
-                  <p className="text-sm font-semibold text-foreground">
-                    Your event cover
+                <div className="p-4 text-center text-slate-400">
+                  <ImagePlus className="mx-auto h-8 w-8 text-slate-300 mb-2" />
+                  <p className="text-xs font-semibold text-slate-700">
+                    No image chosen
                   </p>
-                  <p className="mt-1 text-xs">
-                    Use a bright, high-quality image in landscape format.
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Recommended 16:9 landscape format
                   </p>
-                </div>
-              )}
-              {imagePreview && (
-                <div className="absolute inset-x-3 bottom-3 rounded-lg bg-black/65 px-3 py-2 text-xs text-white">
-                  Preview ready
                 </div>
               )}
             </div>
-            <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-primary/35 bg-primary/5 px-3 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10">
+
+            <label className="mt-3 flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-border bg-slate-50 py-2 px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">
               <UploadCloud className="h-4 w-4" />
-              {imageFile ? "Choose another image" : "Upload event image"}
+              <span>{imageFile ? "Replace Cover Photo" : "Upload Image"}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -287,18 +321,36 @@ export default function CreateEventPage() {
                 className="sr-only"
               />
             </label>
-            <p className="mt-2 text-center text-xs text-muted-foreground">
-              JPG, PNG or WebP · up to 10 MB
+            <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
+              PNG, JPG, or WebP up to 10 MB (AWS S3 Hosted)
             </p>
           </div>
-          <div className="rounded-xl border border-primary/15 bg-primary/5 p-4 text-sm">
-            <p className="font-semibold">A great listing includes</p>
-            <p className="mt-2 leading-6 text-muted-foreground">
-              A specific title, a vivid description, an accurate venue, and a
-              cover image that tells the story at a glance.
-            </p>
+
+          {/* Publishing Checklist */}
+          <div className="rounded-xl border border-border bg-white p-5 shadow-card">
+            <h3 className="text-xs font-bold text-slate-900 mb-3">
+              Event Quality Checklist
+            </h3>
+            <ul className="space-y-2 text-xs text-slate-600">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Clear event title and detailed schedule</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Exact address or GPS venue identifier</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Ticket inventory matched to physical room limits</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Instant attendee notifications upon booking</span>
+              </li>
+            </ul>
           </div>
-        </aside>
+        </div>
       </form>
     </div>
   );

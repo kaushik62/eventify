@@ -6,10 +6,8 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CalendarDays,
-  CheckCircle2,
   LockKeyhole,
   Mail,
-  Sparkles,
   Ticket,
   UserRound,
   UsersRound,
@@ -37,13 +35,11 @@ export default function RegisterPage() {
 
     try {
       const user = await register(name, email, password, role);
-
-      router.push(
-        user.role === "ORGANIZER" ? "/organizer" : "/dashboard"
-      );
+      router.push(user.role === "ORGANIZER" ? "/organizer" : "/dashboard");
     } catch (err: any) {
       setError(
-        err?.response?.data?.message || "Registration failed"
+        err?.response?.data?.message ||
+          "Registration failed. Please try a different email."
       );
     } finally {
       setLoading(false);
@@ -51,338 +47,157 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="page-surface relative min-h-[calc(100vh-4rem)] overflow-hidden">
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-32 top-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl" />
-        <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
-
-        {/* Left side */}
-        <section className="hidden lg:block">
-          <div className="max-w-xl">
-
-            {/* Heading */}
-            <h1 className="mt-7 text-5xl font-bold leading-[1.08] tracking-tight xl:text-6xl">
-              Discover.
-              <br />
-              Connect.
-              <br />
-              <span className="text-primary">Experience.</span>
-            </h1>
-
-            <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
-              Create your Eventify account and start discovering
-              experiences or bring your own events to life.
-            </p>
-
-            {/* Features */}
-            <div className="mt-10 space-y-3">
-              <Feature
-                icon={<CalendarDays className="h-5 w-5" />}
-                title="Discover experiences"
-                description="Explore concerts, conferences, sports and more."
-              />
-
-              <Feature
-                icon={<Ticket className="h-5 w-5" />}
-                title="Book with confidence"
-                description="Securely reserve tickets for your favorite events."
-              />
-
-              <Feature
-                icon={<CheckCircle2 className="h-5 w-5" />}
-                title="Everything in one place"
-                description="Manage your bookings from a simple dashboard."
-              />
+    <main className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-subtle">
+              <Ticket className="h-5 w-5 rotate-[-12deg]" />
             </div>
-          </div>
-        </section>
+          </Link>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
+            Create your Eventify account
+          </h1>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Get started as an attendee or register to host events.
+          </p>
+        </div>
 
-        {/* Register card */}
-        <section className="mx-auto w-full max-w-md">
-          <div className="glass-strong p-7 sm:p-9">
-
-            {/* Header */}
-            <div className="mb-7">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Ticket className="h-6 w-6" />
-              </div>
-
-              <h2 className="mt-5 text-2xl font-bold tracking-tight sm:text-3xl">
-                Create your account
-              </h2>
-
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Join Eventify and start your next experience.
-              </p>
+        {/* Form Container */}
+        <div className="rounded-xl border border-border bg-white p-6 sm:p-8 shadow-card">
+          {error && (
+            <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+              {error}
             </div>
+          )}
 
-            {/* Error */}
-            {error && (
-              <div
-                role="alert"
-                className="mb-5 rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300"
-              >
-                <p className="font-medium">
-                  Unable to create account
-                </p>
-
-                <p className="mt-1 text-xs opacity-90">
-                  {error}
-                </p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-
-              {/* Name */}
-              <div>
-                <label
-                  htmlFor="name"
-                  className="mb-2 block text-sm font-semibold"
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Account Type Selector */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-900 mb-2">
+                I want to:
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("USER")}
+                  className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all ${
+                    role === "USER"
+                      ? "border-primary bg-indigo-50/70 text-primary shadow-subtle font-semibold"
+                      : "border-border bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
                 >
-                  Full name
-                </label>
+                  <UsersRound className="h-4 w-4 mb-1" />
+                  <span className="text-xs">Attend Events</span>
+                </button>
 
-                <div className="relative">
-                  <UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-                  <Input
-                    id="name"
-                    required
-                    autoComplete="name"
-                    placeholder="Your full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="h-12 rounded-xl pl-10"
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-sm font-semibold"
+                <button
+                  type="button"
+                  onClick={() => setRole("ORGANIZER")}
+                  className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all ${
+                    role === "ORGANIZER"
+                      ? "border-primary bg-indigo-50/70 text-primary shadow-subtle font-semibold"
+                      : "border-border bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
                 >
-                  Email address
-                </label>
-
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-12 rounded-xl pl-10"
-                  />
-                </div>
+                  <CalendarDays className="h-4 w-4 mb-1" />
+                  <span className="text-xs">Host Events</span>
+                </button>
               </div>
-
-              {/* Password */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="mb-2 block text-sm font-semibold"
-                >
-                  Password
-                </label>
-
-                <div className="relative">
-                  <LockKeyhole className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    minLength={6}
-                    autoComplete="new-password"
-                    placeholder="At least 6 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-12 rounded-xl pl-10"
-                  />
-                </div>
-
-                <p className="mt-1.5 text-[11px] text-muted-foreground">
-                  Use at least 6 characters for your password.
-                </p>
-              </div>
-
-              {/* Role selection */}
-              <div>
-                <div className="mb-2">
-                  <p className="text-sm font-semibold">
-                    How will you use Eventify?
-                  </p>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Choose the experience that fits you best.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-
-                  {/* User */}
-                  <RoleCard
-                    selected={role === "USER"}
-                    icon={<UsersRound className="h-5 w-5" />}
-                    title="Attend events"
-                    description="Book tickets"
-                    onClick={() => setRole("USER")}
-                  />
-
-                  {/* Organizer */}
-                  <RoleCard
-                    selected={role === "ORGANIZER"}
-                    icon={<CalendarDays className="h-5 w-5" />}
-                    title="Organize events"
-                    description="Create events"
-                    onClick={() => setRole("ORGANIZER")}
-                  />
-
-                </div>
-              </div>
-
-              {/* Submit */}
-              <Button
-                type="submit"
-                size="lg"
-                disabled={loading}
-                className="h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/25"
-              >
-                {loading ? (
-                  <>
-                    <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Creating account...
-                  </>
-                ) : (
-                  <>
-                    Create account
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            {/* Security */}
-            <div className="mt-5 flex items-center justify-center gap-2 text-[11px] text-muted-foreground">
-              <LockKeyhole className="h-3.5 w-3.5" />
-              Your information is securely protected
             </div>
 
-            {/* Login */}
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-border" />
-
-              <span className="text-xs text-muted-foreground">
-                Already a member?
-              </span>
-
-              <div className="h-px flex-1 bg-border" />
+            {/* Name */}
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-xs font-semibold text-slate-900 mb-1.5"
+              >
+                Full Name
+              </label>
+              <div className="relative">
+                <UserRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  id="name"
+                  required
+                  autoComplete="name"
+                  placeholder="Kaushik Sharma"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="pl-9 h-10 text-xs"
+                />
+              </div>
             </div>
 
-            <Link href="/login" className="block">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 w-full rounded-xl font-medium"
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-xs font-semibold text-slate-900 mb-1.5"
               >
-                Log in to Eventify
-              </Button>
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-9 h-10 text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-xs font-semibold text-slate-900 mb-1.5"
+              >
+                Password
+              </label>
+              <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  placeholder="Minimum 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-9 h-10 text-xs"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={loading}
+              className="w-full h-10 text-xs font-semibold mt-2"
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+              <ArrowRight className="h-3.5 w-3.5 ml-1" />
+            </Button>
+          </form>
+
+          <div className="mt-6 border-t border-border pt-4 text-center text-xs text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-primary hover:text-indigo-700"
+            >
+              Sign in
             </Link>
-
-            <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
-              By creating an account, you agree to use Eventify
-              responsibly and securely.
-            </p>
           </div>
-        </section>
+        </div>
       </div>
     </main>
-  );
-}
-
-function Feature({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="glass card-hover group flex items-center gap-4 p-5">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-200 group-hover:scale-105">
-        {icon}
-      </div>
-
-      <div>
-        <p className="text-sm font-semibold">{title}</p>
-
-        <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
-          {description}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function RoleCard({
-  selected,
-  icon,
-  title,
-  description,
-  onClick,
-}: {
-  selected: boolean;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
-      className={`relative rounded-2xl border p-4 text-left transition-all duration-200 ${
-        selected
-          ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
-          : "border-border bg-background hover:border-primary/40 hover:bg-muted/30"
-      }`}
-    >
-      {selected && (
-        <div className="absolute right-3 top-3">
-          <CheckCircle2 className="h-4 w-4 text-primary" />
-        </div>
-      )}
-
-      <div
-        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-          selected
-            ? "bg-primary/10 text-primary"
-            : "bg-muted text-muted-foreground"
-        }`}
-      >
-        {icon}
-      </div>
-
-      <p className="mt-3 text-sm font-semibold">{title}</p>
-
-      <p className="mt-1 text-[11px] text-muted-foreground">
-        {description}
-      </p>
-    </button>
   );
 }

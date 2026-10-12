@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays, Mail, ShieldCheck, Users } from "lucide-react";
+import { Mail, ShieldCheck, Users, Search } from "lucide-react";
 import api from "@/lib/api";
 import { User } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     api
@@ -18,14 +21,14 @@ export default function AdminUsersPage() {
 
   const regularUsers = users.filter((u) => u.role === "USER");
 
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+  const filteredUsers = regularUsers.filter((u) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+  });
 
   const getInitials = (name: string) => {
+    if (!name) return "U";
     return name
       .split(" ")
       .map((part) => part[0])
@@ -35,259 +38,107 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="page-surface min-h-screen">
-      <div className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            Attendee Directory
+          </h1>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Manage registered user accounts and customer access.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-white px-3 py-1.5 shadow-subtle">
+          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            Registered:{" "}
+          </span>
+          <span className="text-xs font-bold text-slate-900">
+            {loading ? "—" : regularUsers.length} accounts
+          </span>
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="rounded-xl border border-border bg-white shadow-card overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border p-4">
           <div>
-            <p className="mb-2 text-sm font-medium text-primary">
-              Admin dashboard
-            </p>
-
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Users
-            </h1>
-
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              Manage registered users and monitor the Eventify community.
+            <h2 className="text-sm font-bold text-slate-900">User Records</h2>
+            <p className="text-xs text-muted-foreground">
+              Showing {filteredUsers.length} of {regularUsers.length} users
             </p>
           </div>
 
-          <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Total users
-            </p>
-
-            <p className="mt-1 text-2xl font-bold">
-              {loading ? "—" : regularUsers.length}
-            </p>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search user name or email..."
+              className="pl-8 h-8 text-xs"
+            />
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Regular users
-                </p>
-
-                <p className="mt-2 text-2xl font-bold">
-                  {loading
-                    ? "—"
-                    : regularUsers.length.toLocaleString("en-IN")}
-                </p>
-              </div>
-
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Users className="h-5 w-5" />
-              </div>
-            </div>
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <p className="mt-2 text-xs text-muted-foreground">Loading users directory...</p>
           </div>
-
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Platform accounts
-                </p>
-
-                <p className="mt-2 text-2xl font-bold">
-                  {loading
-                    ? "—"
-                    : users.length.toLocaleString("en-IN")}
-                </p>
-              </div>
-
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-            </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="p-12 text-center text-xs text-muted-foreground">
+            No matching users found.
           </div>
-
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  User accounts
-                </p>
-
-                <p className="mt-2 text-2xl font-bold">
-                  {loading || users.length === 0
-                    ? "—"
-                    : `${Math.round(
-                        (regularUsers.length / users.length) * 100
-                      )}%`}
-                </p>
-              </div>
-
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-                <CalendarDays className="h-5 w-5" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Users */}
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="flex flex-col gap-2 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">
-                All users
-              </h2>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                View users registered on the Eventify platform.
-              </p>
-            </div>
-
-            {!loading && regularUsers.length > 0 && (
-              <span className="w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                {regularUsers.length}{" "}
-                {regularUsers.length === 1 ? "user" : "users"}
-              </span>
-            )}
-          </div>
-
-          {loading ? (
-            <div className="space-y-4 p-5">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div
-                  key={item}
-                  className="h-16 animate-pulse rounded-xl bg-muted"
-                />
-              ))}
-            </div>
-          ) : regularUsers.length === 0 ? (
-            <div className="flex min-h-[320px] flex-col items-center justify-center px-6 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-                <Users className="h-6 w-6 text-muted-foreground" />
-              </div>
-
-              <h3 className="text-lg font-semibold">
-                No users found
-              </h3>
-
-              <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Regular user accounts will appear here when people register
-                on Eventify.
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Desktop table */}
-              <div className="hidden overflow-x-auto md:block">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/40 text-left">
-                      <th className="px-5 py-4 font-medium text-muted-foreground">
-                        User
-                      </th>
-
-                      <th className="px-5 py-4 font-medium text-muted-foreground">
-                        Email
-                      </th>
-
-                      <th className="px-5 py-4 font-medium text-muted-foreground">
-                        Role
-                      </th>
-
-                      <th className="px-5 py-4 font-medium text-muted-foreground">
-                        Joined
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {regularUsers.map((user) => (
-                      <tr
-                        key={user.id}
-                        className="border-b border-border transition-colors last:border-0 hover:bg-muted/30"
-                      >
-                        <td className="px-5 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                              {getInitials(user.name)}
-                            </div>
-
-                            <div>
-                              <p className="font-semibold">
-                                {user.name}
-                              </p>
-
-                              <p className="mt-0.5 text-xs text-muted-foreground">
-                                Customer account
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-
-                        <td className="px-5 py-4">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Mail className="h-4 w-4" />
-                            <span>{user.email}</span>
-                          </div>
-                        </td>
-
-                        <td className="px-5 py-4">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">
-                            <Users className="h-3.5 w-3.5" />
-                            USER
-                          </span>
-                        </td>
-
-                        <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">
-                          {formatDate(user.created_at)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile cards */}
-              <div className="divide-y divide-border md:hidden">
-                {regularUsers.map((user) => (
-                  <div key={user.id} className="p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                        {getInitials(user.name)}
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="saas-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email Address</th>
+                  <th>Role</th>
+                  <th>Created At</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((u) => (
+                  <tr key={u.id}>
+                    <td>
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-700">
+                          {getInitials(u.name)}
+                        </span>
+                        <span className="font-semibold text-slate-900">
+                          {u.name}
+                        </span>
                       </div>
-
-                      <div className="min-w-0">
-                        <h3 className="truncate font-semibold">
-                          {user.name}
-                        </h3>
-
-                        <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between rounded-xl bg-muted/40 p-3">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                          Joined
-                        </p>
-
-                        <p className="mt-1 font-medium">
-                          {formatDate(user.created_at)}
-                        </p>
-                      </div>
-
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">
-                        <Users className="h-3.5 w-3.5" />
-                        User
+                    </td>
+                    <td>
+                      <span className="text-xs text-slate-600">{u.email}</span>
+                    </td>
+                    <td>
+                      <Badge variant="secondary">ATTENDEE</Badge>
+                    </td>
+                    <td>
+                      <span className="text-xs text-slate-500">
+                        {new Date(u.created_at).toLocaleDateString("en-IN", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
                       </span>
-                    </div>
-                  </div>
+                    </td>
+                    <td>
+                      <Badge variant="success">Active</Badge>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-            </>
-          )}
-        </div>
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

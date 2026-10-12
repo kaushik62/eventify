@@ -6,20 +6,18 @@ import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
-  CalendarDays,
   Ticket,
   ChevronDown,
   LayoutDashboard,
   LogOut,
   User,
+  Sparkles,
+  Compass,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
-
-const navLinks = [
-  { href: "/events", label: "Explore", userOnly: true },
-];
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -34,40 +32,30 @@ export function Navbar() {
   const isOrganizer = user?.role === "ORGANIZER";
   const isAdmin = user?.role === "ADMIN";
 
-  // Dashboard route based on role
   const dashboardLink = isAdmin
-    ? "/admin/dashboard"
+    ? "/admin"
     : isOrganizer
       ? "/organizer"
       : "/dashboard";
 
-  // Explore is visible only to USER.
-  // About is visible to everyone.
-  const visibleNavLinks = navLinks.filter(
-    ({ userOnly }) => !userOnly || isUser
-  );
-
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 16);
+      setScrolled(window.scrollY > 12);
     };
 
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menus when the route changes
   useEffect(() => {
     setOpen(false);
     setDropdownOpen(false);
   }, [pathname]);
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   const handleLogout = () => {
     setOpen(false);
@@ -77,297 +65,247 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         scrolled
-          ? "glass-nav shadow-[0_8px_32px_-12px_rgba(0,0,0,0.7)]"
-          : "border-b border-white/[0.06] bg-[hsl(222_36%_5%/0.5)] backdrop-blur-xl"
+          ? "border-b border-border bg-white/95 shadow-subtle backdrop-blur-md"
+          : "border-b border-border/80 bg-white"
       }`}
     >
-      <nav className="mx-auto flex h-[4.75rem] max-w-[88rem] items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="group flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground"
-        >
-          Eventify
-        </Link>
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand Logo */}
+        <div className="flex items-center gap-8">
+          <Link
+            href="/"
+            className="group flex items-center gap-2.5 text-base font-bold tracking-tight text-foreground"
+          >
+            <span className="text-lg font-bold tracking-tight text-slate-900">
+              Eventify
+            </span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden items-center gap-1 md:flex">
-          {visibleNavLinks.map(({ href, label }) => (
+          {/* Primary Nav Links */}
+          <div className="hidden items-center gap-1 sm:flex">
             <Link
-              key={href}
-              href={href}
-              className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                isActive(href)
-                  ? "bg-white/[0.08] text-foreground"
-                  : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+              href="/events"
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                isActive("/events")
+                  ? "bg-slate-100 text-slate-900 font-semibold"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
-              {label}
+              <Compass className="h-4 w-4 text-slate-400" />
+              Explore Events
             </Link>
-          ))}
+
+            {user && isUser && (
+              <Link
+                href="/dashboard"
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  isActive("/dashboard")
+                    ? "bg-slate-100 text-slate-900 font-semibold"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <Ticket className="h-4 w-4 text-slate-400" />
+                My Bookings
+              </Link>
+            )}
+          </div>
         </div>
 
-        {/* Desktop Authentication */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Right Nav: Auth / User Controls */}
+        <div className="hidden items-center gap-3 sm:flex">
           {user ? (
-            <>
-              {/* My Bookings: USER only */}
-              {isUser && (
-                <Link
-                  href="/dashboard"
-                  className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                    pathname.startsWith("/dashboard")
-                      ? "bg-white/[0.08] text-foreground"
-                      : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-1.5 text-sm font-medium text-slate-800 shadow-subtle transition-colors hover:bg-slate-50"
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </span>
+                <span className="max-w-[120px] truncate text-xs font-semibold text-slate-800">
+                  {user.name ? user.name.split(" ")[0] : "Account"}
+                </span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-150 ${
+                    dropdownOpen ? "rotate-180" : ""
                   }`}
-                >
-                  My Bookings
-                </Link>
-              )}
+                />
+              </button>
 
-              {/* User Dropdown */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-2 text-sm font-medium text-foreground transition-all hover:bg-white/[0.1]"
-                  aria-expanded={dropdownOpen}
-                  aria-haspopup="true"
-                >
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-xs font-bold text-primary">
-                    {user.name.charAt(0).toUpperCase()}
-                  </span>
-
-                  <span className="max-w-[120px] truncate">
-                    {user.name.split(" ")[0]}
-                  </span>
-
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${
-                      dropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {dropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-2xl border border-white/10 bg-[hsl(220_28%_10%/0.98)] shadow-glass-xl backdrop-blur-2xl">
-                    {/* User Information */}
-                    <div className="border-b border-white/10 px-4 py-3">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Signed in as
-                      </p>
-
-                      <p className="mt-0.5 truncate text-sm font-semibold">
-                        {user.email}
-                      </p>
-
-                      <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+              {dropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-border bg-white p-1.5 shadow-dropdown animate-in fade-in zoom-in-95 duration-100">
+                  {/* User Meta */}
+                  <div className="border-b border-border/80 px-3 py-2.5">
+                    <p className="truncate text-xs font-semibold text-slate-900">
+                      {user.name}
+                    </p>
+                    <p className="truncate text-[11px] text-muted-foreground">
+                      {user.email}
+                    </p>
+                    <div className="mt-1.5">
+                      <Badge
+                        variant={
+                          user.role === "ADMIN"
+                            ? "destructive"
+                            : user.role === "ORGANIZER"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {user.role}
-                      </span>
-                    </div>
-
-                    <div className="p-1.5">
-                      {/* Role-based Dashboard */}
-                      <Link
-                        href={dashboardLink}
-                        className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
-                      </Link>
-
-                      {/* My Bookings: USER only */}
-                      {isUser && (
-                        <Link
-                          href="/dashboard"
-                          className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          <Ticket className="h-4 w-4" />
-                          My Bookings
-                        </Link>
-                      )}
-
-                      {/* Organizer Profile */}
-                      {isOrganizer && (
-                        <Link
-                          href="/organizer/profile"
-                          className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          <User className="h-4 w-4" />
-                          Profile
-                        </Link>
-                      )}
-
-                      {/* Sign Out */}
-                      <button
-                        type="button"
-                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-400/10"
-                        onClick={handleLogout}
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign out
-                      </button>
+                      </Badge>
                     </div>
                   </div>
-                )}
-              </div>
-            </>
+
+                  {/* Actions */}
+                  <div className="pt-1">
+                    <Link
+                      href={dashboardLink}
+                      className="flex items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                      Dashboard
+                    </Link>
+
+                    {isUser && (
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <Ticket className="h-4 w-4 text-slate-400" />
+                        My Bookings
+                      </Link>
+                    )}
+
+                    {isOrganizer && (
+                      <Link
+                        href="/organizer/profile"
+                        className="flex items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <User className="h-4 w-4 text-slate-400" />
+                        Profile Settings
+                      </Link>
+                    )}
+
+                    <div className="my-1 border-t border-border/70" />
+
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4 text-red-500" />
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
-            <>
+            <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-white/[0.05] hover:text-foreground"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
               >
-                Log in
+                Sign in
               </Link>
-
               <Link href="/register">
-                <Button size="sm" className="rounded-xl shadow-glow">
+                <Button size="sm">
                   Get Started
                 </Button>
               </Link>
-            </>
+            </div>
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile menu trigger */}
         <button
           type="button"
-          className="rounded-xl border border-white/10 bg-white/[0.05] p-2.5 transition-colors hover:bg-white/[0.1] md:hidden"
+          className="rounded-md border border-border p-2 text-slate-600 hover:bg-slate-50 sm:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
-          aria-expanded={open}
         >
-          {open ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Drawer */}
       {open && (
-        <div className="border-t border-white/10 bg-[hsl(222_36%_5%/0.98)] px-4 py-4 backdrop-blur-2xl md:hidden">
+        <div className="border-t border-border bg-white px-4 py-3 sm:hidden">
           <div className="flex flex-col gap-1">
-            {/* Role-based Navigation */}
-            {visibleNavLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                  isActive(href)
-                    ? "bg-white/[0.08] text-foreground"
-                    : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
-                }`}
-                onClick={() => setOpen(false)}
-              >
-                {label}
-              </Link>
-            ))}
-
-            <div className="my-2 border-t border-white/10" />
+            <Link
+              href="/events"
+              className={`rounded-md px-3 py-2 text-sm font-medium ${
+                isActive("/events")
+                  ? "bg-slate-100 text-slate-900 font-semibold"
+                  : "text-slate-600"
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              Explore Events
+            </Link>
 
             {user ? (
               <>
-                {/* User Information */}
-                <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-4 py-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-sm font-bold text-primary">
-                    {user.name.charAt(0).toUpperCase()}
-                  </span>
-
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold">
-                      {user.name}
-                    </p>
-
-                    <p className="truncate text-xs text-muted-foreground">
-                      {user.email}
-                    </p>
-
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-primary">
-                      {user.role}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Role-based Dashboard */}
                 <Link
                   href={dashboardLink}
-                  className="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-600"
                   onClick={() => setOpen(false)}
                 >
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
+                  Dashboard ({user.role})
                 </Link>
 
-                {/* My Bookings: USER only */}
                 {isUser && (
                   <Link
                     href="/dashboard"
-                    className="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-slate-600"
                     onClick={() => setOpen(false)}
                   >
-                    <Ticket className="h-4 w-4" />
                     My Bookings
                   </Link>
                 )}
 
-                {/* Organizer Profile */}
-                {isOrganizer && (
-                  <Link
-                    href="/organizer/profile"
-                    className="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
-                    onClick={() => setOpen(false)}
-                  >
-                    <User className="h-4 w-4" />
-                    Profile
-                  </Link>
-                )}
+                <div className="my-2 border-t border-border" />
 
-                {/* Sign Out */}
                 <button
                   type="button"
-                  className="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition-colors hover:bg-red-400/5"
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-red-600"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4" />
-                  Sign out
+                  Sign out ({user.email})
                 </button>
               </>
             ) : (
-              <>
+              <div className="mt-2 flex flex-col gap-2 pt-2 border-t border-border">
                 <Link
                   href="/login"
-                  className="rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+                  className="rounded-md border border-border py-2 text-center text-sm font-medium text-slate-700"
                   onClick={() => setOpen(false)}
                 >
-                  Log in
+                  Sign in
                 </Link>
-
                 <Link
                   href="/register"
                   onClick={() => setOpen(false)}
                 >
-                  <Button
-                    size="sm"
-                    className="mt-1 h-11 w-full rounded-xl"
-                  >
-                    Get Started
-                  </Button>
+                  <Button className="w-full">Get Started</Button>
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Click Outside to Close Dropdown */}
+      {/* Click outside backdrop for dropdown */}
       {dropdownOpen && (
         <div
           className="fixed inset-0 z-[-1]"

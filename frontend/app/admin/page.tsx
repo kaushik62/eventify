@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   CalendarDays,
   IndianRupee,
   Ticket,
   TrendingUp,
   Users,
-  UserRoundCog,
+  Building2,
+  ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import api from "@/lib/api";
 import { AdminStats } from "@/lib/types";
 
@@ -26,32 +30,32 @@ export default function AdminDashboardPage() {
 
   const cards = [
     {
-      label: "Total Users",
+      label: "Registered Users",
       value: stats?.totalUsers,
       icon: Users,
-      description: "Registered customers",
-      iconClass: "bg-primary/10 text-primary",
+      description: "Attendee customer accounts",
+      href: "/admin/users",
     },
     {
-      label: "Total Organizers",
+      label: "Active Organizers",
       value: stats?.totalOrganizers,
-      icon: UserRoundCog,
-      description: "Event creators",
-      iconClass: "bg-violet-500/10 text-violet-400",
+      icon: Building2,
+      description: "Event creator accounts",
+      href: "/admin/organizers",
     },
     {
-      label: "Total Events",
+      label: "Platform Events",
       value: stats?.totalEvents,
       icon: CalendarDays,
-      description: "Events on platform",
-      iconClass: "bg-emerald-500/10 text-emerald-400",
+      description: "Total listings created",
+      href: "/admin/events",
     },
     {
-      label: "Total Bookings",
+      label: "Ticket Bookings",
       value: stats?.totalBookings,
       icon: Ticket,
-      description: "Tickets booked",
-      iconClass: "bg-amber-500/10 text-amber-400",
+      description: "Completed checkout orders",
+      href: "/admin/bookings",
     },
   ];
 
@@ -61,165 +65,117 @@ export default function AdminDashboardPage() {
 
   const formatCurrency = (value: string | number | undefined) => {
     if (value === undefined || value === null) return "—";
-
     return `₹${Number(value).toLocaleString("en-IN")}`;
   };
 
   return (
-    <div className="page-surface min-h-screen">
-      <div className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="premium-panel relative overflow-hidden p-7 sm:p-9">
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
-
-          <div className="relative">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Platform overview
-            </div>
-
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Admin Dashboard
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Platform Administration
             </h1>
-
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              Get a quick overview of users, organizers, events, bookings,
-              and revenue across Eventify.
-            </p>
+            <Badge variant="destructive">Super Admin</Badge>
           </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            System-wide metric monitoring, user management, and event auditing.
+          </p>
         </div>
 
-        {/* Main Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {cards.map((card) => {
-            const Icon = card.icon;
-
-            return (
-              <Card
-                key={card.label}
-                className="overflow-hidden border-border shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        {card.label}
-                      </p>
-
-                      <p className="mt-3 text-3xl font-bold tracking-tight">
-                        {loading ? "—" : formatNumber(card.value)}
-                      </p>
-
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        {card.description}
-                      </p>
-                    </div>
-
-                    <div
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${card.iconClass}`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          <Badge variant="success">All Systems Operational</Badge>
         </div>
+      </div>
 
-        {/* Revenue */}
-        <Card className="relative overflow-hidden border-border shadow-sm">
-          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
-
-          <CardContent className="relative p-6 sm:p-8">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
-                    <IndianRupee className="h-5 w-5" />
-                  </div>
-
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Total Revenue
-                  </p>
-                </div>
-
-                <p className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-                  {loading ? "—" : formatCurrency(stats?.totalRevenue)}
-                </p>
-
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Revenue generated from bookings across the platform.
-                </p>
+      {/* Primary KPI Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <Link
+              key={card.label}
+              href={card.href}
+              className="rounded-xl border border-border bg-white p-5 shadow-card transition-all duration-150 hover:border-slate-300 hover:shadow-card-hover"
+            >
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {card.label}
+                </span>
+                <Icon className="h-4 w-4 text-slate-400" />
               </div>
 
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
-                <TrendingUp className="h-7 w-7" />
+              <div className="mt-3">
+                <p className="text-3xl font-black tracking-tight text-slate-900">
+                  {loading ? (
+                    <span className="inline-block h-8 w-16 animate-pulse rounded bg-slate-100" />
+                  ) : (
+                    formatNumber(card.value)
+                  )}
+                </p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {card.description}
+                </p>
               </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Platform Gross Volume Card */}
+      <div className="rounded-xl border border-border bg-white p-6 shadow-card">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <IndianRupee className="h-4 w-4 text-emerald-600" />
+              <span>Platform Gross Merchandise Value (GMV)</span>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Overview */}
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Users className="h-5 w-5" />
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold">Users</p>
-                <p className="text-xs text-muted-foreground">
-                  People using Eventify
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-5 text-2xl font-bold">
-              {loading ? "—" : formatNumber(stats?.totalUsers)}
+            <p className="mt-2 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+              {loading ? (
+                <span className="inline-block h-10 w-44 animate-pulse rounded bg-slate-100" />
+              ) : (
+                formatCurrency(stats?.totalRevenue)
+              )}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Total transaction volume settled through Razorpay integration across all live events.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-                <CalendarDays className="h-5 w-5" />
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold">Events</p>
-                <p className="text-xs text-muted-foreground">
-                  Events available on the platform
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-5 text-2xl font-bold">
-              {loading ? "—" : formatNumber(stats?.totalEvents)}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
-                <Ticket className="h-5 w-5" />
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold">Bookings</p>
-                <p className="text-xs text-muted-foreground">
-                  Tickets purchased by users
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-5 text-2xl font-bold">
-              {loading ? "—" : formatNumber(stats?.totalBookings)}
-            </p>
+          <div className="flex items-center gap-2">
+            <Link href="/admin/bookings">
+              <Button variant="outline" size="sm">
+                View All Transactions
+                <ArrowRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </Link>
           </div>
         </div>
+      </div>
+
+      {/* Management Directory Quick Links */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { title: "User Directory", href: "/admin/users", desc: "Manage registered attendees" },
+          { title: "Organizer Directory", href: "/admin/organizers", desc: "Manage verified organizers" },
+          { title: "Events Audit", href: "/admin/events", desc: "Audit live and past listings" },
+          { title: "Booking Ledger", href: "/admin/bookings", desc: "Review all ticketing logs" },
+        ].map((item) => (
+          <Link
+            key={item.title}
+            href={item.href}
+            className="rounded-xl border border-border bg-white p-4 shadow-card hover:border-slate-300 transition-colors"
+          >
+            <h3 className="text-xs font-bold text-slate-900 flex items-center justify-between">
+              <span>{item.title}</span>
+              <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+            </h3>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {item.desc}
+            </p>
+          </Link>
+        ))}
       </div>
     </div>
   );

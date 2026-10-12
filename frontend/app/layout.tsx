@@ -15,11 +15,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Eventify — Discover Your Next Unforgettable Experience",
+    default: "Eventify — Discover & Book Exceptional Live Events",
     template: "%s | Eventify",
   },
   description:
-    "Discover, book, and manage unforgettable events with Eventify — your premium event discovery and booking platform.",
+    "Curated event discovery, instant ticketing, and real-time organizer workspaces. Powered by secure payments and verified creators.",
   applicationName: "Eventify",
   keywords: [
     "events",
@@ -42,23 +42,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
         <AuthProvider>
           <div className="flex min-h-screen flex-col">
             {/* Global navigation */}
             <Navbar />
 
             {/* Main application content */}
-            <main className="flex-1">
+            <div className="flex-1">
               {children}
-            </main>
+            </div>
 
             {/* Global footer */}
             <Footer />
 
             {/* Floating AI assistant */}
             <AIAssistant />
-
           </div>
         </AuthProvider>
       </body>
