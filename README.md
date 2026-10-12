@@ -34,6 +34,12 @@ The goal is a codebase a fresher can fully understand and defend line by line.
 
 ---
 
+# Admin Login 
+
+# Email	admin@eventify.com
+# Password	admin123
+# Role	ADMIN (Super Administrator)
+
 ## 2. Project Structure
 
 ```
