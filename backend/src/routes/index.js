@@ -7,6 +7,7 @@ import paymentRoutes from "./payment.routes.js";
 import aiRoutes from "./ai.routes.js";
 import uploadRoutes from "./upload.routes.js";
 import adminRoutes from "./admin.routes.js";
+import organizerRoutes from "./organizer.routes.js";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use("/payments", paymentRoutes);
 router.use("/ai", aiRoutes);
 router.use("/uploads", uploadRoutes);
 router.use("/admin", adminRoutes);
+router.use("/organizers", organizerRoutes);
 
 export default router;

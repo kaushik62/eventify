@@ -8,7 +8,16 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  register: (name: string, email: string, password: string, role: "USER" | "ORGANIZER") => Promise<User>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: "USER" | "ORGANIZER",
+    organizationName?: string,
+    bio?: string
+  ) => Promise<User>;
+  applyForOrganizer: (organizationName?: string, bio?: string) => Promise<User>;
+  refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -44,12 +53,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     email: string,
     password: string,
-    role: "USER" | "ORGANIZER"
+    role: "USER" | "ORGANIZER",
+    organizationName?: string,
+    bio?: string
   ) => {
-    const res = await api.post("/auth/register", { name, email, password, role });
+    const res = await api.post("/auth/register", {
+      name,
+      email,
+      password,
+      role,
+      organizationName,
+      bio,
+    });
     const userData = res.data.user || res.data.data?.user || res.data.data;
     setUser(userData);
     return userData as User;
+  };
+
+  const applyForOrganizer = async (organizationName?: string, bio?: string) => {
+    const res = await api.post("/organizers/apply", {
+      organizationName,
+      bio,
+    });
+    const updated = res.data.data?.organizer || res.data.data || res.data.user;
+    if (updated) {
+      setUser((prev) => (prev ? { ...prev, ...updated } : updated));
+    }
+    await fetchMe();
+    return updated as User;
+  };
+
+  const refreshUser = async () => {
+    await fetchMe();
   };
 
   const logout = async () => {
@@ -62,7 +97,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        applyForOrganizer,
+        refreshUser,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

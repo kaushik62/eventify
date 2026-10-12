@@ -10,6 +10,13 @@ export const registerSchema = z.object({
     .transform((val) => (val ? val.toUpperCase() : "USER"))
     .pipe(z.enum(["USER", "ORGANIZER"]))
     .default("USER"),
+  organizationName: z.string().optional(),
+  bio: z.string().optional(),
+});
+
+export const applyOrganizerSchema = z.object({
+  organizationName: z.string().trim().min(2, "Organization name must be at least 2 characters").optional(),
+  bio: z.string().trim().min(10, "Please provide a short description or experience (minimum 10 characters)").optional(),
 });
 
 export const loginSchema = z.object({

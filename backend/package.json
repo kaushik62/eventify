@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "migrate": "psql $DATABASE_URL -f sql/schema.sql"
+    "migrate": "node src/db/migrate.js",
+    "test": "node test_organizer_workflow.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.588.0",

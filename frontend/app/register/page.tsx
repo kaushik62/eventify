@@ -25,6 +25,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"USER" | "ORGANIZER">("USER");
+  const [organizationName, setOrganizationName] = useState("");
+  const [bio, setBio] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +36,14 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const user = await register(name, email, password, role);
+      const user = await register(
+        name,
+        email,
+        password,
+        role,
+        role === "ORGANIZER" ? organizationName : undefined,
+        role === "ORGANIZER" ? bio : undefined
+      );
       router.push(user.role === "ORGANIZER" ? "/organizer" : "/dashboard");
     } catch (err: any) {
       setError(
@@ -175,6 +184,33 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
+
+            {role === "ORGANIZER" && (
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label
+                    htmlFor="organizationName"
+                    className="block text-xs font-semibold text-slate-900 mb-1.5"
+                  >
+                    Organization / Brand Name (Optional)
+                  </label>
+                  <Input
+                    id="organizationName"
+                    placeholder="e.g. Apex Music Festivals"
+                    value={organizationName}
+                    onChange={(e) => setOrganizationName(e.target.value)}
+                    className="h-10 text-xs"
+                  />
+                </div>
+
+                <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-900">
+                  <p className="font-semibold text-amber-950 mb-0.5">Admin Approval Required</p>
+                  <p className="text-[11px] text-amber-800">
+                    Organizer registrations require administrative review before publishing events. You will be able to browse events as an attendee while your application is pending.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <Button
               type="submit"

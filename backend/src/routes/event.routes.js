@@ -1,40 +1,40 @@
 import { Router } from "express";
 import * as eventController from "../controllers/event.controller.js";
 import * as bookingController from "../controllers/booking.controller.js";
-import { authenticateUser, authorizeRole } from "../middleware/auth.middleware.js";
+import { authenticateUser, requireApprovedOrganizer } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
 router.get(
   "/organizer/my-events",
   authenticateUser,
-  authorizeRole("ORGANIZER"),
+  requireApprovedOrganizer,
   eventController.myEvents
 );
 
 router.get(
   "/organizer/stats",
   authenticateUser,
-  authorizeRole("ORGANIZER"),
+  requireApprovedOrganizer,
   eventController.organizerStats
 );
 
 router.get(
   "/:eventId/bookings",
   authenticateUser,
-  authorizeRole("ORGANIZER"),
+  requireApprovedOrganizer,
   bookingController.eventBookings
 );
 
 router.get("/", eventController.listEvents);
 router.get("/:id", eventController.getEvent);
 
-router.post("/", authenticateUser, authorizeRole("ORGANIZER"), eventController.createEvent);
-router.put("/:id", authenticateUser, authorizeRole("ORGANIZER"), eventController.updateEvent);
+router.post("/", authenticateUser, requireApprovedOrganizer, eventController.createEvent);
+router.put("/:id", authenticateUser, requireApprovedOrganizer, eventController.updateEvent);
 router.delete(
   "/:id",
   authenticateUser,
-  authorizeRole("ORGANIZER", "ADMIN"),
+  requireApprovedOrganizer,
   eventController.deleteEvent
 );
 

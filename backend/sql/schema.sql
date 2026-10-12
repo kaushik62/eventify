@@ -5,6 +5,13 @@ CREATE TABLE users
         email      VARCHAR(255) UNIQUE NOT NULL,
         password   VARCHAR(255) NOT NULL,
         role       VARCHAR(20) NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ORGANIZER', 'ADMIN')),
+        organizer_status VARCHAR(20) DEFAULT NULL CHECK (organizer_status IS NULL OR organizer_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+        organizer_applied_at TIMESTAMP,
+        organizer_decided_at TIMESTAMP,
+        organizer_decided_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        organizer_rejection_reason TEXT,
+        organization_name VARCHAR(255),
+        organizer_bio TEXT,
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
@@ -61,12 +68,36 @@ CREATE TABLE payments
     );
 
 
+CREATE TABLE refunds
+    (
+        id SERIAL PRIMARY KEY,
+        booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+        payment_id INTEGER REFERENCES payments(id) ON DELETE SET NULL,
+        amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
+        reason TEXT,
+        status VARCHAR(20) NOT NULL DEFAULT 'PROCESSED' CHECK (status IN ('PENDING', 'PROCESSED', 'FAILED')),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+
 CREATE INDEX idx_users_email
 ON users (email);
 
 
 CREATE INDEX idx_users_role
 ON users (role);
+
+
+CREATE INDEX idx_users_organizer_status
+ON users (organizer_status);
+
+
+CREATE INDEX idx_refunds_booking
+ON refunds (booking_id);
+
+
+CREATE INDEX idx_refunds_payment
+ON refunds (payment_id);
 
 
 CREATE INDEX idx_events_organizer
