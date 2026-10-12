@@ -102,16 +102,6 @@ export default function OrganizerEventsPage() {
             value: loading ? "—" : upcomingCount,
             icon: Clock,
           },
-          {
-            label: "Tickets Sold",
-            value: loading ? "—" : soldSeats.toLocaleString("en-IN"),
-            icon: Ticket,
-          },
-          {
-            label: "Seats Available",
-            value: loading ? "—" : availableSeats.toLocaleString("en-IN"),
-            icon: Users,
-          },
         ].map(({ label, value, icon: Icon }) => (
           <div
             key={label}

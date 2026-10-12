@@ -87,14 +87,6 @@ export default function AboutPage() {
             Eventify is an event discovery, booking, and management platform built with craftsmanship. We connect passionate attendees with extraordinary organizers.
           </p>
 
-          <div className="mt-8 flex justify-center gap-3">
-            <Link href="/events">
-              <Button size="md">Browse Events</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="outline" size="md">Become an Organizer</Button>
-            </Link>
-          </div>
         </div>
 
         {/* Metrics Grid */}

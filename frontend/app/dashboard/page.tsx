@@ -62,13 +62,6 @@ export default function DashboardPage() {
               Manage your event reservations, e-tickets, and booking receipts.
             </p>
           </div>
-
-          <Link href="/events">
-            <Button size="sm">
-              <Compass className="h-4 w-4 mr-1.5" />
-              Discover Events
-            </Button>
-          </Link>
         </div>
 
         {/* Stats Strip */}

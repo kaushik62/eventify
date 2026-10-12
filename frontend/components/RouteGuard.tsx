@@ -164,11 +164,7 @@ export function RouteGuard({
             </div>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-border">
-              <Link href="/dashboard" className="w-full sm:w-auto">
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  Browse as Attendee
-                </Button>
-              </Link>
+            
 
               <Button
                 variant="default"

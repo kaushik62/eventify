@@ -130,7 +130,7 @@ export default function RegisterPage() {
                   id="name"
                   required
                   autoComplete="name"
-                  placeholder="Kaushik Sharma"
+                  placeholder="Enter your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="pl-9 h-10 text-xs"
@@ -201,13 +201,6 @@ export default function RegisterPage() {
                     onChange={(e) => setOrganizationName(e.target.value)}
                     className="h-10 text-xs"
                   />
-                </div>
-
-                <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-900">
-                  <p className="font-semibold text-amber-950 mb-0.5">Admin Approval Required</p>
-                  <p className="text-[11px] text-amber-800">
-                    Organizer registrations require administrative review before publishing events. You will be able to browse events as an attendee while your application is pending.
-                  </p>
                 </div>
               </div>
             )}

@@ -11,17 +11,10 @@ import {
 } from "lucide-react";
 
 const platformLinks = [
-  { label: "Explore Events", href: "/events" },
+  // { label: "Explore Events", href: "/events" },
   { label: "About Us", href: "/about" },
   { label: "FAQ & Help", href: "/faq" },
   { label: "Contact Us", href: "/contact" },
-];
-
-const accountLinks = [
-  { label: "Sign In", href: "/login" },
-  { label: "Create Account", href: "/register" },
-  { label: "My Bookings", href: "/dashboard" },
-  { label: "Organizer Workspace", href: "/organizer" },
 ];
 
 const socialLinks = [
@@ -83,25 +76,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Account Links */}
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-900">
-              Account
-            </p>
-            <ul className="mt-3 space-y-2.5">
-              {accountLinks.map(({ label, href }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="inline-flex items-center gap-1 text-xs text-slate-600 transition-colors hover:text-primary"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Contact Details */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-900">
@@ -114,21 +88,13 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-slate-400" />
-                <span>+91 98765 43210</span>
+                <span>+91 1234567890</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-3.5 w-3.5 text-slate-400" />
                 <span>Mumbai, India</span>
               </div>
             </div>
-
-            <Link
-              href="/events"
-              className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-border bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
-            >
-              Browse all events
-              <ArrowUpRight className="h-3 w-3 text-slate-400" />
-            </Link>
           </div>
         </div>
 

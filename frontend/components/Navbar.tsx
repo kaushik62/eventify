@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -11,7 +12,6 @@ import {
   LayoutDashboard,
   LogOut,
   User,
-  Sparkles,
   Compass,
 } from "lucide-react";
 
@@ -43,8 +43,13 @@ export function Navbar() {
       setScrolled(window.scrollY > 12);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -83,26 +88,30 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Primary Nav Links */}
+          {/* Desktop Navigation */}
           <div className="hidden items-center gap-1 sm:flex">
-            <Link
-              href="/events"
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                isActive("/events")
-                  ? "bg-slate-100 text-slate-900 font-semibold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              }`}
-            >
-              <Compass className="h-4 w-4 text-slate-400" />
-              Explore Events
-            </Link>
+            {/* Only logged-in USER accounts can see Explore Events */}
+            {user && isUser && (
+              <Link
+                href="/events"
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  isActive("/events")
+                    ? "bg-slate-100 font-semibold text-slate-900"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <Compass className="h-4 w-4 text-slate-400" />
+                Explore Events
+              </Link>
+            )}
 
+            {/* Only USER accounts can see My Bookings */}
             {user && isUser && (
               <Link
                 href="/dashboard"
                 className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   isActive("/dashboard")
-                    ? "bg-slate-100 text-slate-900 font-semibold"
+                    ? "bg-slate-100 font-semibold text-slate-900"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
@@ -113,7 +122,7 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Right Nav: Auth / User Controls */}
+        {/* Desktop Account Controls */}
         <div className="hidden items-center gap-3 sm:flex">
           {user ? (
             <div className="relative">
@@ -125,11 +134,15 @@ export function Navbar() {
                 aria-haspopup="true"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  {user.name
+                    ? user.name.charAt(0).toUpperCase()
+                    : "U"}
                 </span>
+
                 <span className="max-w-[120px] truncate text-xs font-semibold text-slate-800">
                   {user.name ? user.name.split(" ")[0] : "Account"}
                 </span>
+
                 <ChevronDown
                   className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-150 ${
                     dropdownOpen ? "rotate-180" : ""
@@ -138,23 +151,25 @@ export function Navbar() {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-border bg-white p-1.5 shadow-dropdown animate-in fade-in zoom-in-95 duration-100">
-                  {/* User Meta */}
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-white p-1.5 shadow-dropdown animate-in fade-in zoom-in-95 duration-100">
+                  {/* User Information */}
                   <div className="border-b border-border/80 px-3 py-2.5">
                     <p className="truncate text-xs font-semibold text-slate-900">
                       {user.name}
                     </p>
+
                     <p className="truncate text-[11px] text-muted-foreground">
                       {user.email}
                     </p>
+
                     <div className="mt-1.5">
                       <Badge
                         variant={
                           user.role === "ADMIN"
                             ? "destructive"
                             : user.role === "ORGANIZER"
-                            ? "default"
-                            : "secondary"
+                              ? "default"
+                              : "secondary"
                         }
                       >
                         {user.role}
@@ -162,7 +177,7 @@ export function Navbar() {
                     </div>
                   </div>
 
-                  {/* Actions */}
+                  {/* Account Actions */}
                   <div className="pt-1">
                     <Link
                       href={dashboardLink}
@@ -217,41 +232,48 @@ export function Navbar() {
               >
                 Sign in
               </Link>
+
               <Link href="/register">
-                <Button size="sm">
-                  Get Started
-                </Button>
+                <Button size="sm">Get Started</Button>
               </Link>
             </div>
           )}
         </div>
 
-        {/* Mobile menu trigger */}
+        {/* Mobile Menu Button */}
         <button
           type="button"
           className="rounded-md border border-border p-2 text-slate-600 hover:bg-slate-50 sm:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
+          aria-expanded={open}
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {open ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </button>
       </nav>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Navigation Drawer */}
       {open && (
         <div className="border-t border-border bg-white px-4 py-3 sm:hidden">
           <div className="flex flex-col gap-1">
-            <Link
-              href="/events"
-              className={`rounded-md px-3 py-2 text-sm font-medium ${
-                isActive("/events")
-                  ? "bg-slate-100 text-slate-900 font-semibold"
-                  : "text-slate-600"
-              }`}
-              onClick={() => setOpen(false)}
-            >
-              Explore Events
-            </Link>
+            {/* Only logged-in USER accounts can see Explore Events */}
+            {user && isUser && (
+              <Link
+                href="/events"
+                className={`rounded-md px-3 py-2 text-sm font-medium ${
+                  isActive("/events")
+                    ? "bg-slate-100 font-semibold text-slate-900"
+                    : "text-slate-600"
+                }`}
+                onClick={() => setOpen(false)}
+              >
+                Explore Events
+              </Link>
+            )}
 
             {user ? (
               <>
@@ -273,6 +295,16 @@ export function Navbar() {
                   </Link>
                 )}
 
+                {isOrganizer && (
+                  <Link
+                    href="/organizer/profile"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-slate-600"
+                    onClick={() => setOpen(false)}
+                  >
+                    Profile Settings
+                  </Link>
+                )}
+
                 <div className="my-2 border-t border-border" />
 
                 <button
@@ -285,7 +317,7 @@ export function Navbar() {
                 </button>
               </>
             ) : (
-              <div className="mt-2 flex flex-col gap-2 pt-2 border-t border-border">
+              <div className="mt-2 flex flex-col gap-2 border-t border-border pt-2">
                 <Link
                   href="/login"
                   className="rounded-md border border-border py-2 text-center text-sm font-medium text-slate-700"
@@ -293,6 +325,7 @@ export function Navbar() {
                 >
                   Sign in
                 </Link>
+
                 <Link
                   href="/register"
                   onClick={() => setOpen(false)}
@@ -305,12 +338,13 @@ export function Navbar() {
         </div>
       )}
 
-      {/* Click outside backdrop for dropdown */}
+      {/* Click Outside to Close Dropdown */}
       {dropdownOpen && (
-        <div
-          className="fixed inset-0 z-[-1]"
+        <button
+          type="button"
+          className="fixed inset-0 z-40 cursor-default"
           onClick={() => setDropdownOpen(false)}
-          aria-hidden="true"
+          aria-label="Close account menu"
         />
       )}
     </header>

@@ -134,13 +134,6 @@ export default function OrganizerProfilePage() {
               <span>Attendee Bookings</span>
               <ArrowRight className="h-3 w-3" />
             </Link>
-            <Link
-              href="/events"
-              className="flex items-center justify-between text-slate-600 hover:text-primary py-1"
-            >
-              <span>View Live Marketplace</span>
-              <ArrowRight className="h-3 w-3" />
-            </Link>
           </div>
         </div>
       </div>

@@ -94,7 +94,7 @@ export default function HomePage() {
           <div className="grid items-center gap-12 lg:grid-cols-12">
             {/* Left Headline & Search */}
             <div className="lg:col-span-7">
-            
+
 
               <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
                 Discover exceptional live events. <br className="hidden sm:inline" />
@@ -104,39 +104,6 @@ export default function HomePage() {
               <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
                 Eventify is the modern platform for discovering concerts, tech conferences, workshops, and cultural gatherings. Real-time seat tracking and verified organizers.
               </p>
-
-              {/* Integrated Search Bar */}
-              <form
-                onSubmit={handleSearch}
-                className="mt-8 rounded-xl border border-border bg-white p-2 shadow-card sm:flex sm:items-center sm:gap-2"
-              >
-                <div className="flex flex-1 items-center gap-2.5 rounded-lg px-3 py-2 text-slate-400 focus-within:text-slate-900">
-                  <Search className="h-4 w-4 shrink-0 text-slate-400" />
-                  <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search event, artist, topic..."
-                    className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
-
-                <div className="my-2 h-6 w-px bg-border hidden sm:block" />
-
-                <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-400 focus-within:text-slate-900 sm:w-44">
-                  <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-                  <input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Location / City"
-                    className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
-
-                <Button type="submit" size="md" className="w-full sm:w-auto shrink-0">
-                  <Search className="h-4 w-4" />
-                  <span>Find Events</span>
-                </Button>
-              </form>
 
               {/* Metric stats strip */}
               <div className="mt-10 grid grid-cols-2 gap-4 border-t border-border pt-8 sm:grid-cols-4">
@@ -200,112 +167,18 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    <Link href="/events">
-                      <Button size="sm">
-                        View Event
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
+
+                    <Button size="sm" disabled>
+                      View Event
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+
+
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* CATEGORIES BROWSER */}
-      <section className="py-14 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                Explore by Category
-              </p>
-              <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                Browse events that match your passion
-              </h2>
-            </div>
-            <Link
-              href="/events"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-indigo-700 transition-colors"
-            >
-              All categories
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {categories.map(({ name, icon: Icon, desc }) => (
-              <Link
-                key={name}
-                href={`/events?category=${encodeURIComponent(name)}`}
-                className="group flex flex-col rounded-xl border border-border bg-white p-4 shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-card-hover"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-primary group-hover:text-white">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-3 text-sm font-semibold text-slate-900">
-                  {name}
-                </h3>
-                <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1">
-                  {desc}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURED UPCOMING EVENTS */}
-      <section className="border-y border-border bg-slate-50/60 py-14 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                Curated Listings
-              </p>
-              <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                Upcoming Live Experiences
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Hand-picked events with tickets available right now.
-              </p>
-            </div>
-            <Link href="/events">
-              <Button variant="outline" size="sm">
-                View All Events
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-80 animate-pulse rounded-xl border border-border bg-white"
-                />
-              ))}
-            </div>
-          ) : events.length === 0 ? (
-            <div className="mt-8 rounded-xl border border-border bg-white p-12 text-center">
-              <Ticket className="mx-auto h-10 w-10 text-slate-300" />
-              <h3 className="mt-3 text-sm font-semibold text-slate-900">
-                No events listed at the moment
-              </h3>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Check back shortly or register as an organizer to list your event.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {events.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
@@ -350,10 +223,6 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-xl border border-border bg-white p-8 sm:p-12 shadow-card flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="max-w-xl">
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-                <Users className="h-3 w-3" />
-                For Event Creators
-              </span>
               <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 Hosting a conference, workshop, or gig?
               </h2>
@@ -365,13 +234,13 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               <Link href="/register">
                 <Button size="lg" className="w-full sm:w-auto">
-                  Start Hosting Events
+                  Create Account
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/login">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  Organizer Login
+                  Login to Dashboard
                 </Button>
               </Link>
             </div>

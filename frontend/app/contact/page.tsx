@@ -43,7 +43,7 @@ export default function ContactPage() {
     {
       icon: Phone,
       label: "Phone Line",
-      value: "+91 98765 43210",
+      value: "+91 12345 67890",
       desc: "Mon–Fri, 9:30 AM – 6:30 PM IST",
     },
     {
@@ -131,7 +131,7 @@ export default function ContactPage() {
                   </label>
                   <Input
                     required
-                    placeholder="Kaushik Sharma"
+                    placeholder="Enter your name"
                     value={form.name}
                     onChange={(e) => update("name", e.target.value)}
                     className="h-10 text-xs"
